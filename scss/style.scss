@@ -1,0 +1,98 @@
+$background-color: black;
+// $container-size: 8rem; // 127px; // 106px;
+$ball-size: 9rem;
+$grid-gap: 1rem;
+
+html * {
+  margin: 0;
+  padding: 0;
+  background-color: $background-color;
+}
+body {
+  height: 100%;
+}
+
+/* grid layout */
+ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax($ball-size, 2fr));
+  grid-gap: $grid-gap;
+  // grid-auto-rows: $container-size;
+  // grid-auto-columns: $container-size;
+}
+ul > li {
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+
+}
+
+// sphere effect
+// below is thanks to https://codepen.io/donovanh/pen/GBIiv
+.ball {
+  // display: block;
+  width: $ball-size;
+  height: $ball-size;
+  margin: 0;
+  padding: auto;
+  border-radius: 50%;
+  position: relative;
+  -webkit-transform-style: preserve-3d;
+  background-size: auto 50%;
+  background: url("") repeat-x;
+}
+
+.ball:before {
+  content: "";
+  position: absolute;
+  top: 0%;
+  left: 0%;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  box-shadow: -40px 10px 70px 10px rgba(0, 0, 0, 0.8) inset;
+  z-index: 2;
+}
+
+.ball:after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  -webkit-filter: blur(0);
+  opacity: 0.3;
+  background: radial-gradient(
+    circle at 50% 80%,
+    #81e8f6,
+    #76deef 10%,
+    #055194 66%,
+    #062745 100%
+  );
+}
+
+.ball .shadow {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(0, 0, 0, 0.4),
+    rgba(0, 0, 0, 0.1) 40%,
+    rgba(0, 0, 0, 0) 50%
+  );
+}
+.stage {
+  -webkit-perspective: 1200px;
+  -moz-perspective: 1200px;
+  -ms-perspective: 1200px;
+  -o-perspective: 1200px;
+  perspective: 1200px;
+  -webkit-perspective-origin: 50% 50%;
+  -moz-perspective-origin: 50% 50%;
+  -ms-perspective-origin: 50% 50%;
+  -o-perspective-origin: 50% 50%;
+  perspective-origin: 50% 50%;
+}

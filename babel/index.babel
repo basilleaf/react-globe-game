@@ -1,0 +1,43 @@
+const baseUrl = "https://s3-us-west-1.amazonaws.com/marsfromspace.com/"
+
+var thumbnailStyle = function(imageUrl){
+  return ({
+    backgroundImage: "url(" + { imageUrl } + ")" 
+    });
+}
+  
+class Gallery extends React.Component {
+     
+  renderImage(imageUrl) {
+    
+    return (
+      <li key={imageUrl.split('/').pop()}><section className="stage">
+        <figure className="ball" 
+            style = {{background: "url('" + imageUrl + "') repeat-x" }}
+          ><span className="shadow"></span></figure>
+      </section></li>
+    );
+  }
+
+  render() {
+    return (
+      <div className="gallery">
+        <ul className="images">
+          {this.props.imageUrls.map(imageUrl => 
+            this.renderImage(imageUrl))}
+        </ul>
+      </div>
+    );
+  }
+}
+
+var imageUrls = [];  // collect list full path urls
+var imageLinks = document.getElementsByTagName("img"); 
+for(let i = 0;i < imageLinks.length; i++) {
+    imageName = imageLinks[i].src.split('/').pop();
+    imageUrls.push(baseUrl + imageName); 
+  }
+
+document.getElementById('prerendered').remove();
+
+ReactDOM.render(<Gallery imageUrls={imageUrls} />, document.getElementById("root"));
