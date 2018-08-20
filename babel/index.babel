@@ -1,21 +1,55 @@
-const baseUrl = "https://s3-us-west-1.amazonaws.com/marsfromspace.com/"
+const baseUrl = "https://s3-us-west-1.amazonaws.com/marsfromspace.com/";
 
-var thumbnailStyle = function(imageUrl){
-  return ({
-    backgroundImage: "url(" + { imageUrl } + ")" 
-    });
-}
-  
+var thumbnailHighlight = function(imageUrl) {
+  return {
+    border: "1px solid white"
+  };
+};
+
 class Gallery extends React.Component {
-     
-  renderImage(imageUrl) {
-    
+  constructor(props) {
+    super(props);
+    this.state = {
+      clickedPair: Array()
+    };
+  }
+
+  checkMatch(key, e) {
+    if (this.state.clickedPair[0] == key) {
+      alert("please click a different box"); // this box was already clicked
+      return;
+    }
+
+    this.state.clickedPair.push(key);
+
+    var imageNames = this.state.clickedPair.map(x => x.split(".jpg")[0]);
+    var imageIndexes = this.state.clickedPair.map(x => x.split(".jpg")[1]);
+
+    if (imageNames.length == 2) {
+      // see if we have a check
+      if (imageNames[0] == imageNames[1]) {
+        alert("you win!");
+      } else {
+        alert("NOPE");
+      }
+      this.state.clickedPair = Array();
+    }
+  }
+
+  renderImage(imageUrl, index) {
+    const key = imageUrl.split("/").pop() + String(index); // unique key
+
     return (
-      <li key={imageUrl.split('/').pop()}><section className="stage">
-        <figure className="ball" 
-            style = {{background: "url('" + imageUrl + "') repeat-x" }}
-          ><span className="shadow"></span></figure>
-      </section></li>
+      <li key={key} onClick={e => this.checkMatch(key, e)}>
+        <section className="stage">
+          <figure
+            className="ball"
+            style={{ background: "url('" + imageUrl + "') repeat-x" }}
+          >
+            <span className="shadow" />
+          </figure>
+        </section>
+      </li>
     );
   }
 
@@ -23,21 +57,47 @@ class Gallery extends React.Component {
     return (
       <div className="gallery">
         <ul className="images">
-          {this.props.imageUrls.map(imageUrl => 
-            this.renderImage(imageUrl))}
+          {this.props.imageUrls.map((imageUrl, index) =>
+            this.renderImage(imageUrl, index)
+          )}
         </ul>
       </div>
     );
   }
 }
 
-var imageUrls = [];  // collect list full path urls
-var imageLinks = document.getElementsByTagName("img"); 
-for(let i = 0;i < imageLinks.length; i++) {
-    imageName = imageLinks[i].src.split('/').pop();
-    imageUrls.push(baseUrl + imageName); 
+function shuffle(array) {
+  var currentIndex = array.length,
+    temporaryValue,
+    randomIndex;
+
+  // While there remain elements to shuffle...
+  while (0 !== currentIndex) {
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+
+    // And swap it with the current element.
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
   }
 
-document.getElementById('prerendered').remove();
+  return array;
+}
 
-ReactDOM.render(<Gallery imageUrls={imageUrls} />, document.getElementById("root"));
+var uniqueGlobes = 10; // number of unique globes, this will be times 2 for match game
+
+var allLinks = Array.prototype.slice.call(document.getElementsByTagName("img"));
+var imageLinks = allLinks
+  .slice(0, uniqueGlobes)
+  .concat(allLinks.slice(0, uniqueGlobes));
+imageLinks = shuffle(imageLinks);
+var imageUrls = imageLinks.map(lnk => baseUrl + lnk.src.split("/").pop());
+
+document.getElementById("prerendered").remove();
+
+ReactDOM.render(
+  <Gallery imageUrls={imageUrls} />,
+  document.getElementById("root")
+);
