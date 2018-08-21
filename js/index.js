@@ -10,6 +10,15 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var baseUrl = "https://s3-us-west-1.amazonaws.com/marsfromspace.com/";
 
+var clickedStyles = {
+  clicked: {
+    border: "1px solid white"
+  },
+  default: {
+    border: "0"
+  }
+};
+
 var Gallery = function (_React$Component) {
   _inherits(Gallery, _React$Component);
 
@@ -25,36 +34,57 @@ var Gallery = function (_React$Component) {
   }
 
   _createClass(Gallery, [{
-    key: "checkMatch",
-    value: function checkMatch(key, e) {
-      if (this.state.clickedPair[0] == key) {
+    key: "clickedClass",
+    value: function clickedClass(key) {
+      return this.state.clickedPair.includes(key) ? clickedStyles.clicked : clickedStyles.default;
+    }
+  }, {
+    key: "clickHandler",
+    value: function clickHandler(key) {
+      var _this2 = this;
+
+      var clickedPair = this.state.clickedPair;
+
+      if (clickedPair[0] == key) {
         alert("please click a different box"); // this box was already clicked
         return;
       }
 
-      this.state.clickedPair.push(key);
+      clickedPair.push(key);
+      this.setState({ clickedPair: clickedPair });
 
+      if (clickedPair.length == 2) {
+        setTimeout(function () {
+          return _this2.checkMatch(clickedPair);
+        }, 500);
+      }
+    }
+  }, {
+    key: "checkMatch",
+    value: function checkMatch(clickedPair) {
       var imageNames = this.state.clickedPair.map(function (x) {
         return x.split(".jpg")[0];
       });
-      if (imageNames.length == 2) {
-        var msg = imageNames[0] === imageNames[1] ? "you win!" : "NOPE";
-        alert(msg);
-        this.state.clickedPair = Array();
-      }
+      var msg = imageNames[0] === imageNames[1] ? "you win!" : "NOPE";
+      alert(msg);
+      this.setState({ clickedPair: Array() });
     }
   }, {
     key: "renderImage",
     value: function renderImage(imageUrl, index) {
-      var _this2 = this;
+      var _this3 = this;
 
       var key = imageUrl.split("/").pop() + String(index); // unique key
 
       return React.createElement(
         "li",
-        { key: key, onClick: function onClick(e) {
-            return _this2.checkMatch(key, e);
-          } },
+        {
+          key: key,
+          style: this.clickedClass(key),
+          onClick: function onClick() {
+            return _this3.clickHandler(key);
+          }
+        },
         React.createElement(
           "section",
           { className: "stage" },
@@ -72,7 +102,7 @@ var Gallery = function (_React$Component) {
   }, {
     key: "render",
     value: function render() {
-      var _this3 = this;
+      var _this4 = this;
 
       return React.createElement(
         "div",
@@ -81,7 +111,7 @@ var Gallery = function (_React$Component) {
           "ul",
           { className: "images" },
           this.props.imageUrls.map(function (imageUrl, index) {
-            return _this3.renderImage(imageUrl, index);
+            return _this4.renderImage(imageUrl, index);
           })
         )
       );
@@ -90,6 +120,9 @@ var Gallery = function (_React$Component) {
 
   return Gallery;
 }(React.Component);
+
+// some util functions
+
 
 function shuffle(array) {
   // shuffles a javascript array

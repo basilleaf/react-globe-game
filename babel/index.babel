@@ -1,5 +1,14 @@
 const baseUrl = "https://s3-us-west-1.amazonaws.com/marsfromspace.com/";
 
+var clickedStyles = {
+  clicked: {
+    border: "1px solid white"
+  },
+  default: {
+    border: "0"
+  }
+};
+
 class Gallery extends React.Component {
   constructor(props) {
     super(props);
@@ -8,27 +17,44 @@ class Gallery extends React.Component {
     };
   }
 
-  checkMatch(key, e) {
-    if (this.state.clickedPair[0] == key) {
+  clickedClass(key) {
+    return this.state.clickedPair.includes(key)
+      ? clickedStyles.clicked
+      : clickedStyles.default;
+  }
+
+  clickHandler(key) {
+    var clickedPair = this.state.clickedPair;
+
+    if (clickedPair[0] == key) {
       alert("please click a different box"); // this box was already clicked
       return;
     }
 
-    this.state.clickedPair.push(key);
+    clickedPair.push(key);
+    this.setState({ clickedPair: clickedPair });
 
-    var imageNames = this.state.clickedPair.map(x => x.split(".jpg")[0]);
-    if (imageNames.length == 2) {
-      var msg = imageNames[0] === imageNames[1] ? "you win!" : "NOPE";
-      alert(msg);
-      this.state.clickedPair = Array();
+    if (clickedPair.length == 2) {
+      setTimeout(() => this.checkMatch(clickedPair), 500);
     }
+  }
+
+  checkMatch(clickedPair) {
+    var imageNames = this.state.clickedPair.map(x => x.split(".jpg")[0]);
+    var msg = imageNames[0] === imageNames[1] ? "you win!" : "NOPE";
+    alert(msg);
+    this.setState({ clickedPair: Array() });
   }
 
   renderImage(imageUrl, index) {
     const key = imageUrl.split("/").pop() + String(index); // unique key
 
     return (
-      <li key={key} onClick={e => this.checkMatch(key, e)}>
+      <li
+        key={key}
+        style={this.clickedClass(key)}
+        onClick={() => this.clickHandler(key)}
+      >
         <section className="stage">
           <figure
             className="ball"
@@ -54,6 +80,7 @@ class Gallery extends React.Component {
   }
 }
 
+// some util functions
 function shuffle(array) {
   // shuffles a javascript array
   // via https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
