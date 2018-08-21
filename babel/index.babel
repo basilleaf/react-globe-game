@@ -76,9 +76,28 @@ function shuffle(array) {
   return array;
 }
 
-var uniqueGlobesCount = 10; // number of unique globes, this will be times 2 for match game
+function getGlobesCount() {
+  // try to fill the page
+  var globeSize = convertRemToPixels(9); // css .ball width/height
+  var w = window.innerWidth;
+  var h = window.innerHeight;
+  var colCount = Math.floor(w / (1.1 * globeSize)); // multiplier is just a guess
+  var rowCount = Math.floor(h / (1.1 * globeSize)); // to account for padding
 
-var allLinks = Array.prototype.slice.call(document.getElementsByTagName("img"));
+  return Math.floor(colCount * rowCount / 2);
+}
+
+function convertRemToPixels(rem) {
+  // via https://stackoverflow.com/questions/36532307/rem-px-in-javascript
+  return rem * parseFloat(getComputedStyle(document.documentElement).fontSize);
+}
+
+// ready go
+var uniqueGlobesCount = getGlobesCount(); // number of unique globes, this will be times 2 for match game
+
+var allLinks = shuffle(
+  Array.prototype.slice.call(document.getElementsByTagName("img"))
+);
 var imageLinks = allLinks
   .slice(0, uniqueGlobesCount)
   .concat(allLinks.slice(0, uniqueGlobesCount));
