@@ -12,6 +12,11 @@ body {
   height: 100%;
 }
 
+// hide the preprendered html
+#prerendered {
+  display: none;
+}
+
 /* grid layout */
 ul {
   display: grid;
@@ -24,7 +29,6 @@ ul > li {
   padding: 0;
   margin: 0;
   list-style-type: none;
-
 }
 
 // sphere effect

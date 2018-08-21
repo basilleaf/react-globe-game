@@ -8,6 +8,10 @@ body {
   height: 100%;
 }
 
+#prerendered {
+  display: none;
+}
+
 /* grid layout */
 ul {
   display: grid;
