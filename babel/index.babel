@@ -1,11 +1,5 @@
 const baseUrl = "https://s3-us-west-1.amazonaws.com/marsfromspace.com/";
 
-var thumbnailHighlight = function(imageUrl) {
-  return {
-    border: "1px solid white"
-  };
-};
-
 class Gallery extends React.Component {
   constructor(props) {
     super(props);
@@ -23,15 +17,9 @@ class Gallery extends React.Component {
     this.state.clickedPair.push(key);
 
     var imageNames = this.state.clickedPair.map(x => x.split(".jpg")[0]);
-    var imageIndexes = this.state.clickedPair.map(x => x.split(".jpg")[1]);
-
     if (imageNames.length == 2) {
-      // see if we have a check
-      if (imageNames[0] == imageNames[1]) {
-        alert("you win!");
-      } else {
-        alert("NOPE");
-      }
+      var msg = imageNames[0] === imageNames[1] ? "you win!" : "NOPE";
+      alert(msg);
       this.state.clickedPair = Array();
     }
   }
@@ -67,6 +55,8 @@ class Gallery extends React.Component {
 }
 
 function shuffle(array) {
+  // shuffles a javascript array
+  // via https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
   var currentIndex = array.length,
     temporaryValue,
     randomIndex;
@@ -86,12 +76,12 @@ function shuffle(array) {
   return array;
 }
 
-var uniqueGlobes = 10; // number of unique globes, this will be times 2 for match game
+var uniqueGlobesCount = 10; // number of unique globes, this will be times 2 for match game
 
 var allLinks = Array.prototype.slice.call(document.getElementsByTagName("img"));
 var imageLinks = allLinks
-  .slice(0, uniqueGlobes)
-  .concat(allLinks.slice(0, uniqueGlobes));
+  .slice(0, uniqueGlobesCount)
+  .concat(allLinks.slice(0, uniqueGlobesCount));
 imageLinks = shuffle(imageLinks);
 var imageUrls = imageLinks.map(lnk => baseUrl + lnk.src.split("/").pop());
 
