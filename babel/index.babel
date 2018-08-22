@@ -78,7 +78,7 @@ class Gallery extends React.Component {
     if (finished.length == 2 * uniqueGlobesCount) {
       // all matches on the board have been found
       setTimeout(() => {
-        this.renderStartOver(true, "good job!", "start over");
+        this.renderStartOver(true, "good job!", "play again");
       }, 200);
     }
   }

@@ -107,7 +107,7 @@ var Gallery = function (_React$Component) {
       if (finished.length == 2 * uniqueGlobesCount) {
         // all matches on the board have been found
         setTimeout(function () {
-          _this3.renderStartOver(true, "good job!", "start over");
+          _this3.renderStartOver(true, "good job!", "play again");
         }, 200);
       }
     }
