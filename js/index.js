@@ -15,7 +15,13 @@ var clickedStyles = {
     border: "1px solid white"
   },
   default: {
-    border: "0"
+    border: "1px solid black"
+  }
+};
+
+var finishedStyles = {
+  finished: {
+    display: "none"
   }
 };
 
@@ -28,22 +34,33 @@ var Gallery = function (_React$Component) {
     var _this = _possibleConstructorReturn(this, (Gallery.__proto__ || Object.getPrototypeOf(Gallery)).call(this, props));
 
     _this.state = {
-      clickedPair: Array()
+      clickedPair: Array(),
+      finished: Array()
     };
     return _this;
   }
 
   _createClass(Gallery, [{
-    key: "clickedClass",
-    value: function clickedClass(key) {
+    key: "clickIndicatorClassName",
+    value: function clickIndicatorClassName(key) {
       return this.state.clickedPair.includes(key) ? clickedStyles.clicked : clickedStyles.default;
+    }
+  }, {
+    key: "finishedIndicatorClassName",
+    value: function finishedIndicatorClassName(key) {
+      if (this.state.finished.includes(key)) {
+        return finishedStyles.finished;
+      }
     }
   }, {
     key: "clickHandler",
     value: function clickHandler(key) {
       var _this2 = this;
 
-      var clickedPair = this.state.clickedPair;
+      if (this.state.finished.includes(key)) {
+        return;
+      }
+      var clickedPair = this.state.clickedPair.slice();
 
       if (clickedPair[0] == key) {
         alert("please click a different box"); // this box was already clicked
@@ -54,9 +71,10 @@ var Gallery = function (_React$Component) {
       this.setState({ clickedPair: clickedPair });
 
       if (clickedPair.length == 2) {
+        // setTimeout gets the 2nd clicked globe style to render
         setTimeout(function () {
           return _this2.checkMatch(clickedPair);
-        }, 500);
+        }, 200);
       }
     }
   }, {
@@ -65,9 +83,14 @@ var Gallery = function (_React$Component) {
       var imageNames = this.state.clickedPair.map(function (x) {
         return x.split(".jpg")[0];
       });
-      var msg = imageNames[0] === imageNames[1] ? "you win!" : "NOPE";
-      alert(msg);
+      var msg = "NOPE";
+      if (imageNames[0] === imageNames[1]) {
+        msg = "you win!";
+        var finished = this.state.finished.slice().concat(clickedPair);
+        this.setState({ finished: finished });
+      }
       this.setState({ clickedPair: Array() });
+      alert(msg);
     }
   }, {
     key: "renderImage",
@@ -80,14 +103,14 @@ var Gallery = function (_React$Component) {
         "li",
         {
           key: key,
-          style: this.clickedClass(key),
+          style: this.clickIndicatorClassName(key),
           onClick: function onClick() {
             return _this3.clickHandler(key);
           }
         },
         React.createElement(
           "section",
-          { className: "stage" },
+          { style: this.finishedIndicatorClassName(key), className: "stage" },
           React.createElement(
             "figure",
             {
@@ -121,9 +144,33 @@ var Gallery = function (_React$Component) {
   return Gallery;
 }(React.Component);
 
+function getGlobesCount() {
+  // try to fill the page
+  var globeSize = convertRemToPixels(9); // css .ball width/height
+  var w = window.innerWidth;
+  var h = window.innerHeight;
+  var colCount = Math.floor(w / (1.1 * globeSize)); // multiplier is just a guess
+  var rowCount = Math.floor(h / (1.1 * globeSize)); // to account for padding
+
+  return Math.floor(colCount * rowCount / 2);
+}
+
+// ready go
+var uniqueGlobesCount = getGlobesCount(); // number of unique globes, this will be times 2 for match game
+
+var allLinks = shuffle(Array.prototype.slice.call(document.getElementsByTagName("img")));
+var imageLinks = allLinks.slice(0, uniqueGlobesCount).concat(allLinks.slice(0, uniqueGlobesCount));
+imageLinks = shuffle(imageLinks);
+var imageUrls = imageLinks.map(function (lnk) {
+  return baseUrl + lnk.src.split("/").pop();
+});
+
+document.getElementById("prerendered").remove();
+
+ReactDOM.render(React.createElement(Gallery, { imageUrls: imageUrls }), document.getElementById("root"));
+"use strict";
+
 // some util functions
-
-
 function shuffle(array) {
   // shuffles a javascript array
   // via https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
@@ -146,33 +193,7 @@ function shuffle(array) {
   return array;
 }
 
-function getGlobesCount() {
-  // try to fill the page
-  var globeSize = convertRemToPixels(9); // css .ball width/height
-  var w = window.innerWidth;
-  var h = window.innerHeight;
-  var colCount = Math.floor(w / (1.1 * globeSize)); // multiplier is just a guess
-  var rowCount = Math.floor(h / (1.1 * globeSize)); // to account for padding
-
-  return Math.floor(colCount * rowCount / 2);
-}
-
 function convertRemToPixels(rem) {
   // via https://stackoverflow.com/questions/36532307/rem-px-in-javascript
   return rem * parseFloat(getComputedStyle(document.documentElement).fontSize);
 }
-
-// ready go
-var uniqueGlobesCount = getGlobesCount(); // number of unique globes, this will be times 2 for match game
-
-var allLinks = shuffle(Array.prototype.slice.call(document.getElementsByTagName("img")));
-var imageLinks = allLinks.slice(0, uniqueGlobesCount).concat(allLinks.slice(0, uniqueGlobesCount));
-imageLinks = shuffle(imageLinks);
-var imageUrls = imageLinks.map(function (lnk) {
-  return baseUrl + lnk.src.split("/").pop();
-});
-
-document.getElementById("prerendered").remove();
-
-ReactDOM.render(React.createElement(Gallery, { imageUrls: imageUrls }), document.getElementById("root"));
-

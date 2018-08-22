@@ -1,11 +1,17 @@
 const baseUrl = "https://s3-us-west-1.amazonaws.com/marsfromspace.com/";
 
-var globeStyles = {
+var clickedStyles = {
   clicked: {
     border: "1px solid white"
   },
   default: {
-    border: "0"
+    border: "1px solid black"
+  }
+};
+
+var finishedStyles = {
+  finished: {
+    display: "none"
   }
 };
 
@@ -13,18 +19,27 @@ class Gallery extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      clickedPair: Array()
+      clickedPair: Array(),
+      finished: Array()
     };
   }
 
-  clickedClass(key) {
+  clickIndicatorClassName(key) {
     return this.state.clickedPair.includes(key)
-      ? globeStyles.clicked
-      : globeStyles.default;
+      ? clickedStyles.clicked
+      : clickedStyles.default;
+  }
+  finishedIndicatorClassName(key) {
+    if (this.state.finished.includes(key)) {
+      return finishedStyles.finished;
+    }
   }
 
   clickHandler(key) {
-    var clickedPair = this.state.clickedPair;
+    if (this.state.finished.includes(key)) {
+      return;
+    }
+    let clickedPair = this.state.clickedPair.slice();
 
     if (clickedPair[0] == key) {
       alert("please click a different box"); // this box was already clicked
@@ -35,15 +50,21 @@ class Gallery extends React.Component {
     this.setState({ clickedPair: clickedPair });
 
     if (clickedPair.length == 2) {
-      setTimeout(() => this.checkMatch(clickedPair), 500);
+      // setTimeout gets the 2nd clicked globe style to render
+      setTimeout(() => this.checkMatch(clickedPair), 200);
     }
   }
 
   checkMatch(clickedPair) {
-    var imageNames = this.state.clickedPair.map(x => x.split(".jpg")[0]);
-    var msg = imageNames[0] === imageNames[1] ? "you win!" : "NOPE";
-    alert(msg);
+    let imageNames = this.state.clickedPair.map(x => x.split(".jpg")[0]);
+    let msg = "NOPE";
+    if (imageNames[0] === imageNames[1]) {
+      msg = "you win!";
+      let finished = this.state.finished.slice().concat(clickedPair);
+      this.setState({ finished: finished });
+    }
     this.setState({ clickedPair: Array() });
+    alert(msg);
   }
 
   renderImage(imageUrl, index) {
@@ -52,10 +73,10 @@ class Gallery extends React.Component {
     return (
       <li
         key={key}
-        style={this.clickedClass(key)}
+        style={this.clickIndicatorClassName(key)}
         onClick={() => this.clickHandler(key)}
       >
-        <section className="stage">
+        <section style={this.finishedIndicatorClassName(key)} className="stage">
           <figure
             className="ball"
             style={{ background: "url('" + imageUrl + "') repeat-x" }}
