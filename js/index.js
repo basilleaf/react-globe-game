@@ -35,7 +35,8 @@ var Gallery = function (_React$Component) {
 
     _this.state = {
       clickedPair: Array(),
-      finished: Array()
+      finished: Array(),
+      imageUrls: getNewimageUrls(allLinks)
     };
     return _this;
   }
@@ -85,7 +86,14 @@ var Gallery = function (_React$Component) {
       });
       if (imageNames[0] === imageNames[1]) {
         var finished = this.state.finished.slice().concat(clickedPair);
-        this.setState({ finished: finished });
+
+        if (finished.length == 2 * uniqueGlobesCount) {
+          this.setState({ finished: Array() });
+          this.setState({ imageUrls: getNewimageUrls(allLinks) });
+          alert("you win!");
+        } else {
+          this.setState({ finished: finished });
+        }
       }
       this.setState({ clickedPair: Array() });
     }
@@ -130,7 +138,7 @@ var Gallery = function (_React$Component) {
         React.createElement(
           "ul",
           { className: "images" },
-          this.props.imageUrls.map(function (imageUrl, index) {
+          this.state.imageUrls.map(function (imageUrl, index) {
             return _this4.renderImage(imageUrl, index);
           })
         )
@@ -152,19 +160,22 @@ function getGlobesCount() {
   return Math.floor(colCount * rowCount / 2);
 }
 
+function getNewimageUrls(allLinks) {
+  allLinks = shuffle(allLinks);
+  var imageLinks = allLinks.slice(0, uniqueGlobesCount).concat(allLinks.slice(0, uniqueGlobesCount));
+  return imageLinks.map(function (lnk) {
+    return baseUrl + lnk.src.split("/").pop();
+  });
+}
+
 // ready go
 var uniqueGlobesCount = getGlobesCount(); // number of unique globes, this will be times 2 for match game
 
-var allLinks = shuffle(Array.prototype.slice.call(document.getElementsByTagName("img")));
-var imageLinks = allLinks.slice(0, uniqueGlobesCount).concat(allLinks.slice(0, uniqueGlobesCount));
-imageLinks = shuffle(imageLinks);
-var imageUrls = imageLinks.map(function (lnk) {
-  return baseUrl + lnk.src.split("/").pop();
-});
-
+// grab all links from server-rendered html and remove from dom
+var allLinks = Array.prototype.slice.call(document.getElementsByTagName("img"));
 document.getElementById("prerendered").remove();
 
-ReactDOM.render(React.createElement(Gallery, { imageUrls: imageUrls }), document.getElementById("root"));
+ReactDOM.render(React.createElement(Gallery, { imageUrls: allLinks }), document.getElementById("root"));
 "use strict";
 
 // some util functions

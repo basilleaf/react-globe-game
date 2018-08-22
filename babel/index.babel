@@ -20,7 +20,8 @@ class Gallery extends React.Component {
     super(props);
     this.state = {
       clickedPair: Array(),
-      finished: Array()
+      finished: Array(),
+      imageUrls: getNewimageUrls(allLinks)
     };
   }
 
@@ -59,7 +60,14 @@ class Gallery extends React.Component {
     let imageNames = this.state.clickedPair.map(x => x.split(".jpg")[0]);
     if (imageNames[0] === imageNames[1]) {
       let finished = this.state.finished.slice().concat(clickedPair);
-      this.setState({ finished: finished });
+
+      if (finished.length == 2 * uniqueGlobesCount) {
+        this.setState({ finished: Array() });
+        this.setState({ imageUrls: getNewimageUrls(allLinks) });
+        alert("you win!");
+      } else {
+        this.setState({ finished: finished });
+      }
     }
     this.setState({ clickedPair: Array() });
   }
@@ -89,7 +97,7 @@ class Gallery extends React.Component {
     return (
       <div className="gallery">
         <ul className="images">
-          {this.props.imageUrls.map((imageUrl, index) =>
+          {this.state.imageUrls.map((imageUrl, index) =>
             this.renderImage(imageUrl, index)
           )}
         </ul>
@@ -109,21 +117,22 @@ function getGlobesCount() {
   return Math.floor(colCount * rowCount / 2);
 }
 
+function getNewimageUrls(allLinks) {
+  allLinks = shuffle(allLinks);
+  let imageLinks = allLinks
+    .slice(0, uniqueGlobesCount)
+    .concat(allLinks.slice(0, uniqueGlobesCount));
+  return imageLinks.map(lnk => baseUrl + lnk.src.split("/").pop());
+}
+
 // ready go
-var uniqueGlobesCount = getGlobesCount(); // number of unique globes, this will be times 2 for match game
+const uniqueGlobesCount = getGlobesCount(); // number of unique globes, this will be times 2 for match game
 
-var allLinks = shuffle(
-  Array.prototype.slice.call(document.getElementsByTagName("img"))
-);
-var imageLinks = allLinks
-  .slice(0, uniqueGlobesCount)
-  .concat(allLinks.slice(0, uniqueGlobesCount));
-imageLinks = shuffle(imageLinks);
-var imageUrls = imageLinks.map(lnk => baseUrl + lnk.src.split("/").pop());
-
+// grab all links from server-rendered html and remove from dom
+var allLinks = Array.prototype.slice.call(document.getElementsByTagName("img"));
 document.getElementById("prerendered").remove();
 
 ReactDOM.render(
-  <Gallery imageUrls={imageUrls} />,
+  <Gallery imageUrls={allLinks} />,
   document.getElementById("root")
 );
