@@ -46,7 +46,7 @@ var Gallery = function (_React$Component) {
     value: function startOver() {
       this.setState({ finished: Array() });
       this.setState({ imageUrls: getGameBoardUrls(allLinks) });
-      this.renderStartOver(false);
+      this.renderStartOver(false, "", "");
     }
   }, {
     key: "clickIndicatorClassName",
@@ -107,17 +107,19 @@ var Gallery = function (_React$Component) {
       if (finished.length == 2 * uniqueGlobesCount) {
         // all matches on the board have been found
         setTimeout(function () {
-          _this3.renderStartOver(true);
+          _this3.renderStartOver(true, "good job!", "start over");
         }, 200);
       }
     }
   }, {
     key: "renderStartOver",
-    value: function renderStartOver(display) {
+    value: function renderStartOver(display, msg, btnMsg) {
       var _this4 = this;
 
-      ReactDOM.render(React.createElement(WinScreen, {
+      ReactDOM.render(React.createElement(MessageScreen, {
         display: display,
+        msg: msg,
+        btnMsg: btnMsg,
         restartHandler: function restartHandler() {
           _this4.startOver();
         }
@@ -175,16 +177,16 @@ var Gallery = function (_React$Component) {
   return Gallery;
 }(React.Component);
 
-var WinScreen = function (_React$Component2) {
-  _inherits(WinScreen, _React$Component2);
+var MessageScreen = function (_React$Component2) {
+  _inherits(MessageScreen, _React$Component2);
 
-  function WinScreen() {
-    _classCallCheck(this, WinScreen);
+  function MessageScreen() {
+    _classCallCheck(this, MessageScreen);
 
-    return _possibleConstructorReturn(this, (WinScreen.__proto__ || Object.getPrototypeOf(WinScreen)).apply(this, arguments));
+    return _possibleConstructorReturn(this, (MessageScreen.__proto__ || Object.getPrototypeOf(MessageScreen)).apply(this, arguments));
   }
 
-  _createClass(WinScreen, [{
+  _createClass(MessageScreen, [{
     key: "render",
     value: function render() {
       var styleName = this.props.display ? "block" : "none";
@@ -194,18 +196,18 @@ var WinScreen = function (_React$Component2) {
         React.createElement(
           "h2",
           null,
-          "good job!"
+          this.props.msg
         ),
         React.createElement(
           "button",
           { onClick: this.props.restartHandler },
-          "play again"
+          this.props.btnMsg
         )
       );
     }
   }]);
 
-  return WinScreen;
+  return MessageScreen;
 }(React.Component);
 
 function getGlobesCount() {
@@ -227,6 +229,12 @@ function getGameBoardUrls(allLinks) {
   });
 }
 
+function startGame() {
+  ReactDOM.render(React.createElement(MessageScreen, { display: false }), document.getElementById("msg"));
+
+  ReactDOM.render(React.createElement(Gallery, { imageUrls: allLinks }), document.getElementById("root"));
+}
+
 // ready go
 var uniqueGlobesCount = getGlobesCount(); // number of unique globes, this will be times 2 for match game
 
@@ -234,7 +242,16 @@ var uniqueGlobesCount = getGlobesCount(); // number of unique globes, this will 
 var allLinks = Array.prototype.slice.call(document.getElementsByTagName("img"));
 document.getElementById("prerendered").remove();
 
-ReactDOM.render(React.createElement(Gallery, { imageUrls: allLinks }), document.getElementById("root"));
+var welcomeMsg = "Welcome! This is a visual matching game. Click on the pairs of matching globes.";
+
+ReactDOM.render(React.createElement(MessageScreen, {
+  display: true,
+  msg: welcomeMsg,
+  btnMsg: "Start Game",
+  restartHandler: function restartHandler() {
+    startGame();
+  }
+}), document.getElementById("msg"));
 "use strict";
 
 // some util functions

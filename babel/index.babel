@@ -28,7 +28,7 @@ class Gallery extends React.Component {
   startOver() {
     this.setState({ finished: Array() });
     this.setState({ imageUrls: getGameBoardUrls(allLinks) });
-    this.renderStartOver(false);
+    this.renderStartOver(false, "", "");
   }
 
   clickIndicatorClassName(key) {
@@ -78,15 +78,17 @@ class Gallery extends React.Component {
     if (finished.length == 2 * uniqueGlobesCount) {
       // all matches on the board have been found
       setTimeout(() => {
-        this.renderStartOver(true);
+        this.renderStartOver(true, "good job!", "start over");
       }, 200);
     }
   }
 
-  renderStartOver(display) {
+  renderStartOver(display, msg, btnMsg) {
     ReactDOM.render(
-      <WinScreen
+      <MessageScreen
         display={display}
+        msg={msg}
+        btnMsg={btnMsg}
         restartHandler={() => {
           this.startOver();
         }}
@@ -129,13 +131,13 @@ class Gallery extends React.Component {
   }
 }
 
-class WinScreen extends React.Component {
+class MessageScreen extends React.Component {
   render() {
     var styleName = this.props.display ? "block" : "none";
     return (
       <div className="win" style={{ display: styleName }}>
-        <h2>good job!</h2>
-        <button onClick={this.props.restartHandler}>play again</button>
+        <h2>{this.props.msg}</h2>
+        <button onClick={this.props.restartHandler}>{this.props.btnMsg}</button>
       </div>
     );
   }
@@ -160,6 +162,18 @@ function getGameBoardUrls(allLinks) {
   return imageLinks.map(lnk => baseUrl + lnk.src.split("/").pop());
 }
 
+function startGame() {
+  ReactDOM.render(
+    <MessageScreen display={false} />,
+    document.getElementById("msg")
+  );
+
+  ReactDOM.render(
+    <Gallery imageUrls={allLinks} />,
+    document.getElementById("root")
+  );
+}
+
 // ready go
 const uniqueGlobesCount = getGlobesCount(); // number of unique globes, this will be times 2 for match game
 
@@ -167,7 +181,17 @@ const uniqueGlobesCount = getGlobesCount(); // number of unique globes, this wil
 var allLinks = Array.prototype.slice.call(document.getElementsByTagName("img"));
 document.getElementById("prerendered").remove();
 
+const welcomeMsg =
+  "Welcome! This is a visual matching game. Click on the pairs of matching globes.";
+
 ReactDOM.render(
-  <Gallery imageUrls={allLinks} />,
-  document.getElementById("root")
+  <MessageScreen
+    display={true}
+    msg={welcomeMsg}
+    btnMsg="Start Game"
+    restartHandler={() => {
+      startGame();
+    }}
+  />,
+  document.getElementById("msg")
 );
