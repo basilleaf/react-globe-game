@@ -21,7 +21,7 @@ class Gallery extends React.Component {
     this.state = {
       clickedPair: Array(),
       finished: Array(),
-      imageUrls: getNewimageUrls(allLinks)
+      imageUrls: getGameBoardUrls(allLinks)
     };
   }
 
@@ -61,18 +61,21 @@ class Gallery extends React.Component {
     let imageNames = this.state.clickedPair.map(x => x.split(".jpg")[0]);
     this.setState({ clickedPair: Array() }); // resets clicked pair highlighting
 
-    if (imageNames[0] === imageNames[1]) {
-      // we have a match
-      let finished = this.state.finished.slice().concat(clickedPair);
-      this.setState({ finished: finished });
+    if (imageNames[0] !== imageNames[1]) {
+      return; // these do not match
+    }
 
-      if (finished.length == 2 * uniqueGlobesCount) {
-        setTimeout(() => {
-          alert("you win!");
-          this.setState({ finished: Array() });
-          this.setState({ imageUrls: getNewimageUrls(allLinks) });
-        }, 200);
-      }
+    // we have a match..
+    let finished = this.state.finished.slice().concat(clickedPair);
+    this.setState({ finished: finished });
+
+    if (finished.length == 2 * uniqueGlobesCount) {
+      // all matches were found
+      setTimeout(() => {
+        alert("you win!");
+        this.setState({ finished: Array() });
+        this.setState({ imageUrls: getGameBoardUrls(allLinks) });
+      }, 200);
     }
   }
 
@@ -121,7 +124,7 @@ function getGlobesCount() {
   return Math.floor(colCount * rowCount / 2);
 }
 
-function getNewimageUrls(allLinks) {
+function getGameBoardUrls(allLinks) {
   allLinks = shuffle(allLinks);
   let imageLinks = allLinks
     .slice(0, uniqueGlobesCount)

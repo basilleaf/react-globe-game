@@ -36,7 +36,7 @@ var Gallery = function (_React$Component) {
     _this.state = {
       clickedPair: Array(),
       finished: Array(),
-      imageUrls: getNewimageUrls(allLinks)
+      imageUrls: getGameBoardUrls(allLinks)
     };
     return _this;
   }
@@ -89,18 +89,21 @@ var Gallery = function (_React$Component) {
       });
       this.setState({ clickedPair: Array() }); // resets clicked pair highlighting
 
-      if (imageNames[0] === imageNames[1]) {
-        // we have a match
-        var finished = this.state.finished.slice().concat(clickedPair);
-        this.setState({ finished: finished });
+      if (imageNames[0] !== imageNames[1]) {
+        return; // these do not match
+      }
 
-        if (finished.length == 2 * uniqueGlobesCount) {
-          setTimeout(function () {
-            alert("you win!");
-            _this3.setState({ finished: Array() });
-            _this3.setState({ imageUrls: getNewimageUrls(allLinks) });
-          }, 200);
-        }
+      // we have a match..
+      var finished = this.state.finished.slice().concat(clickedPair);
+      this.setState({ finished: finished });
+
+      if (finished.length == 2 * uniqueGlobesCount) {
+        // all matches were found
+        setTimeout(function () {
+          alert("you win!");
+          _this3.setState({ finished: Array() });
+          _this3.setState({ imageUrls: getGameBoardUrls(allLinks) });
+        }, 200);
       }
     }
   }, {
@@ -166,7 +169,7 @@ function getGlobesCount() {
   return Math.floor(colCount * rowCount / 2);
 }
 
-function getNewimageUrls(allLinks) {
+function getGameBoardUrls(allLinks) {
   allLinks = shuffle(allLinks);
   var imageLinks = allLinks.slice(0, uniqueGlobesCount).concat(allLinks.slice(0, uniqueGlobesCount));
   return imageLinks.map(function (lnk) {
