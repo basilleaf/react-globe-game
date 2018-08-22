@@ -2,7 +2,7 @@
 
 An eye test. Visual matching game in the browser. For learning React. 
 
-deployed at 
+deployed at: 
 
-	https://gracious-ramanujan-1ea017.netlify.com/
+https://gracious-ramanujan-1ea017.netlify.com/
 
