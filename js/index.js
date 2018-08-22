@@ -42,6 +42,13 @@ var Gallery = function (_React$Component) {
   }
 
   _createClass(Gallery, [{
+    key: "startOver",
+    value: function startOver() {
+      this.setState({ finished: Array() });
+      this.setState({ imageUrls: getGameBoardUrls(allLinks) });
+      this.renderStartOver(false);
+    }
+  }, {
     key: "clickIndicatorClassName",
     value: function clickIndicatorClassName(key) {
       return this.state.clickedPair.includes(key) ? clickedStyles.clicked : clickedStyles.default;
@@ -98,18 +105,28 @@ var Gallery = function (_React$Component) {
       this.setState({ finished: finished });
 
       if (finished.length == 2 * uniqueGlobesCount) {
-        // all matches were found
+        // all matches on the board have been found
         setTimeout(function () {
-          alert("you win!");
-          _this3.setState({ finished: Array() });
-          _this3.setState({ imageUrls: getGameBoardUrls(allLinks) });
+          _this3.renderStartOver(true);
         }, 200);
       }
     }
   }, {
-    key: "renderImage",
-    value: function renderImage(imageUrl, index) {
+    key: "renderStartOver",
+    value: function renderStartOver(display) {
       var _this4 = this;
+
+      ReactDOM.render(React.createElement(WinScreen, {
+        display: display,
+        restartHandler: function restartHandler() {
+          _this4.startOver();
+        }
+      }), document.getElementById("msg"));
+    }
+  }, {
+    key: "renderGlobe",
+    value: function renderGlobe(imageUrl, index) {
+      var _this5 = this;
 
       var key = imageUrl.split("/").pop() + String(index); // unique key
 
@@ -119,7 +136,7 @@ var Gallery = function (_React$Component) {
           key: key,
           style: this.clickIndicatorClassName(key),
           onClick: function onClick() {
-            return _this4.clickHandler(key);
+            return _this5.clickHandler(key);
           }
         },
         React.createElement(
@@ -139,7 +156,7 @@ var Gallery = function (_React$Component) {
   }, {
     key: "render",
     value: function render() {
-      var _this5 = this;
+      var _this6 = this;
 
       return React.createElement(
         "div",
@@ -148,7 +165,7 @@ var Gallery = function (_React$Component) {
           "ul",
           { className: "images" },
           this.state.imageUrls.map(function (imageUrl, index) {
-            return _this5.renderImage(imageUrl, index);
+            return _this6.renderGlobe(imageUrl, index);
           })
         )
       );
@@ -156,6 +173,39 @@ var Gallery = function (_React$Component) {
   }]);
 
   return Gallery;
+}(React.Component);
+
+var WinScreen = function (_React$Component2) {
+  _inherits(WinScreen, _React$Component2);
+
+  function WinScreen() {
+    _classCallCheck(this, WinScreen);
+
+    return _possibleConstructorReturn(this, (WinScreen.__proto__ || Object.getPrototypeOf(WinScreen)).apply(this, arguments));
+  }
+
+  _createClass(WinScreen, [{
+    key: "render",
+    value: function render() {
+      var styleName = this.props.display ? "block" : "none";
+      return React.createElement(
+        "div",
+        { className: "win", style: { display: styleName } },
+        React.createElement(
+          "h2",
+          null,
+          "good job!"
+        ),
+        React.createElement(
+          "button",
+          { onClick: this.props.restartHandler },
+          "play again"
+        )
+      );
+    }
+  }]);
+
+  return WinScreen;
 }(React.Component);
 
 function getGlobesCount() {

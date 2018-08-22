@@ -25,6 +25,12 @@ class Gallery extends React.Component {
     };
   }
 
+  startOver() {
+    this.setState({ finished: Array() });
+    this.setState({ imageUrls: getGameBoardUrls(allLinks) });
+    this.renderStartOver(false);
+  }
+
   clickIndicatorClassName(key) {
     return this.state.clickedPair.includes(key)
       ? clickedStyles.clicked
@@ -70,16 +76,26 @@ class Gallery extends React.Component {
     this.setState({ finished: finished });
 
     if (finished.length == 2 * uniqueGlobesCount) {
-      // all matches were found
+      // all matches on the board have been found
       setTimeout(() => {
-        alert("you win!");
-        this.setState({ finished: Array() });
-        this.setState({ imageUrls: getGameBoardUrls(allLinks) });
+        this.renderStartOver(true);
       }, 200);
     }
   }
 
-  renderImage(imageUrl, index) {
+  renderStartOver(display) {
+    ReactDOM.render(
+      <WinScreen
+        display={display}
+        restartHandler={() => {
+          this.startOver();
+        }}
+      />,
+      document.getElementById("msg")
+    );
+  }
+
+  renderGlobe(imageUrl, index) {
     const key = imageUrl.split("/").pop() + String(index); // unique key
 
     return (
@@ -105,9 +121,21 @@ class Gallery extends React.Component {
       <div className="gallery">
         <ul className="images">
           {this.state.imageUrls.map((imageUrl, index) =>
-            this.renderImage(imageUrl, index)
+            this.renderGlobe(imageUrl, index)
           )}
         </ul>
+      </div>
+    );
+  }
+}
+
+class WinScreen extends React.Component {
+  render() {
+    var styleName = this.props.display ? "block" : "none";
+    return (
+      <div className="win" style={{ display: styleName }}>
+        <h2>good job!</h2>
+        <button onClick={this.props.restartHandler}>play again</button>
       </div>
     );
   }

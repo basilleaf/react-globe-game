@@ -12,6 +12,30 @@ body {
   height: 100%;
 }
 
+// interstitial (win) screen styles
+.win {
+  font-family: monospace;
+  margin: 20%;
+  font-size: 160%;
+}
+.win h2 {
+  margin: 1em auto;
+}
+.win,
+.win button {
+  font-size: 110%;
+  padding: 5px 20px;
+  text-align: center;
+  color: white;
+}
+.win button:hover {
+  cursor: grab;
+  color: lightgray;
+}
+.win button:active {
+  color: gray;
+}
+
 // hide the preprendered html
 #prerendered {
   display: none;
