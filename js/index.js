@@ -87,10 +87,12 @@ var Gallery = function (_React$Component) {
       var imageNames = this.state.clickedPair.map(function (x) {
         return x.split(".jpg")[0];
       });
+      this.setState({ clickedPair: Array() }); // resets clicked pair highlighting
+
       if (imageNames[0] === imageNames[1]) {
+        // we have a match
         var finished = this.state.finished.slice().concat(clickedPair);
         this.setState({ finished: finished });
-        this.setState({ clickedPair: Array() });
 
         if (finished.length == 2 * uniqueGlobesCount) {
           setTimeout(function () {

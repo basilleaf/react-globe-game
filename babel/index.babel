@@ -44,8 +44,8 @@ class Gallery extends React.Component {
 
     if (clickedPair[0] == key) {
       // they clicked the same box again, unset it
-      this.setState({ clickedPair: Array() })
-      return
+      this.setState({ clickedPair: Array() });
+      return;
     }
 
     clickedPair.push(key);
@@ -59,10 +59,12 @@ class Gallery extends React.Component {
 
   checkMatch(clickedPair) {
     let imageNames = this.state.clickedPair.map(x => x.split(".jpg")[0]);
+    this.setState({ clickedPair: Array() }); // resets clicked pair highlighting
+
     if (imageNames[0] === imageNames[1]) {
+      // we have a match
       let finished = this.state.finished.slice().concat(clickedPair);
-      this.setState({finished: finished });
-      this.setState({clickedPair: Array() });
+      this.setState({ finished: finished });
 
       if (finished.length == 2 * uniqueGlobesCount) {
         setTimeout(() => {
