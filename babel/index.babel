@@ -1,6 +1,6 @@
 const baseUrl = "https://s3-us-west-1.amazonaws.com/marsfromspace.com/";
 
-var clickedStyles = {
+var globeStyles = {
   clicked: {
     border: "1px solid white"
   },
@@ -19,8 +19,8 @@ class Gallery extends React.Component {
 
   clickedClass(key) {
     return this.state.clickedPair.includes(key)
-      ? clickedStyles.clicked
-      : clickedStyles.default;
+      ? globeStyles.clicked
+      : globeStyles.default;
   }
 
   clickHandler(key) {
@@ -80,29 +80,6 @@ class Gallery extends React.Component {
   }
 }
 
-// some util functions
-function shuffle(array) {
-  // shuffles a javascript array
-  // via https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
-  var currentIndex = array.length,
-    temporaryValue,
-    randomIndex;
-
-  // While there remain elements to shuffle...
-  while (0 !== currentIndex) {
-    // Pick a remaining element...
-    randomIndex = Math.floor(Math.random() * currentIndex);
-    currentIndex -= 1;
-
-    // And swap it with the current element.
-    temporaryValue = array[currentIndex];
-    array[currentIndex] = array[randomIndex];
-    array[randomIndex] = temporaryValue;
-  }
-
-  return array;
-}
-
 function getGlobesCount() {
   // try to fill the page
   var globeSize = convertRemToPixels(9); // css .ball width/height
@@ -112,11 +89,6 @@ function getGlobesCount() {
   var rowCount = Math.floor(h / (1.1 * globeSize)); // to account for padding
 
   return Math.floor(colCount * rowCount / 2);
-}
-
-function convertRemToPixels(rem) {
-  // via https://stackoverflow.com/questions/36532307/rem-px-in-javascript
-  return rem * parseFloat(getComputedStyle(document.documentElement).fontSize);
 }
 
 // ready go
