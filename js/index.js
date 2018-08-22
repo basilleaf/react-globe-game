@@ -74,7 +74,7 @@ var Gallery = function (_React$Component) {
         // setTimeout gets the 2nd clicked globe style to render
         setTimeout(function () {
           return _this2.checkMatch(clickedPair);
-        }, 200);
+        }, 500);
       }
     }
   }, {
@@ -83,14 +83,11 @@ var Gallery = function (_React$Component) {
       var imageNames = this.state.clickedPair.map(function (x) {
         return x.split(".jpg")[0];
       });
-      var msg = "NOPE";
       if (imageNames[0] === imageNames[1]) {
-        msg = "you win!";
         var finished = this.state.finished.slice().concat(clickedPair);
         this.setState({ finished: finished });
       }
       this.setState({ clickedPair: Array() });
-      alert(msg);
     }
   }, {
     key: "renderImage",

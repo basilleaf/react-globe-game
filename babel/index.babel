@@ -51,20 +51,17 @@ class Gallery extends React.Component {
 
     if (clickedPair.length == 2) {
       // setTimeout gets the 2nd clicked globe style to render
-      setTimeout(() => this.checkMatch(clickedPair), 200);
+      setTimeout(() => this.checkMatch(clickedPair), 500);
     }
   }
 
   checkMatch(clickedPair) {
     let imageNames = this.state.clickedPair.map(x => x.split(".jpg")[0]);
-    let msg = "NOPE";
     if (imageNames[0] === imageNames[1]) {
-      msg = "you win!";
       let finished = this.state.finished.slice().concat(clickedPair);
       this.setState({ finished: finished });
     }
     this.setState({ clickedPair: Array() });
-    alert(msg);
   }
 
   renderImage(imageUrl, index) {
