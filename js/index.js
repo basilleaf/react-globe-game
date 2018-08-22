@@ -64,7 +64,8 @@ var Gallery = function (_React$Component) {
       var clickedPair = this.state.clickedPair.slice();
 
       if (clickedPair[0] == key) {
-        alert("please click a different box"); // this box was already clicked
+        // they clicked the same box again, unset it
+        this.setState({ clickedPair: Array() });
         return;
       }
 
@@ -75,32 +76,35 @@ var Gallery = function (_React$Component) {
         // setTimeout gets the 2nd clicked globe style to render
         setTimeout(function () {
           return _this2.checkMatch(clickedPair);
-        }, 500);
+        }, 300);
       }
     }
   }, {
     key: "checkMatch",
     value: function checkMatch(clickedPair) {
+      var _this3 = this;
+
       var imageNames = this.state.clickedPair.map(function (x) {
         return x.split(".jpg")[0];
       });
       if (imageNames[0] === imageNames[1]) {
         var finished = this.state.finished.slice().concat(clickedPair);
+        this.setState({ finished: finished });
+        this.setState({ clickedPair: Array() });
 
         if (finished.length == 2 * uniqueGlobesCount) {
-          this.setState({ finished: Array() });
-          this.setState({ imageUrls: getNewimageUrls(allLinks) });
-          alert("you win!");
-        } else {
-          this.setState({ finished: finished });
+          setTimeout(function () {
+            alert("you win!");
+            _this3.setState({ finished: Array() });
+            _this3.setState({ imageUrls: getNewimageUrls(allLinks) });
+          }, 200);
         }
       }
-      this.setState({ clickedPair: Array() });
     }
   }, {
     key: "renderImage",
     value: function renderImage(imageUrl, index) {
-      var _this3 = this;
+      var _this4 = this;
 
       var key = imageUrl.split("/").pop() + String(index); // unique key
 
@@ -110,7 +114,7 @@ var Gallery = function (_React$Component) {
           key: key,
           style: this.clickIndicatorClassName(key),
           onClick: function onClick() {
-            return _this3.clickHandler(key);
+            return _this4.clickHandler(key);
           }
         },
         React.createElement(
@@ -130,7 +134,7 @@ var Gallery = function (_React$Component) {
   }, {
     key: "render",
     value: function render() {
-      var _this4 = this;
+      var _this5 = this;
 
       return React.createElement(
         "div",
@@ -139,7 +143,7 @@ var Gallery = function (_React$Component) {
           "ul",
           { className: "images" },
           this.state.imageUrls.map(function (imageUrl, index) {
-            return _this4.renderImage(imageUrl, index);
+            return _this5.renderImage(imageUrl, index);
           })
         )
       );

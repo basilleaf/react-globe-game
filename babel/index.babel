@@ -43,8 +43,9 @@ class Gallery extends React.Component {
     let clickedPair = this.state.clickedPair.slice();
 
     if (clickedPair[0] == key) {
-      alert("please click a different box"); // this box was already clicked
-      return;
+      // they clicked the same box again, unset it
+      this.setState({ clickedPair: Array() })
+      return
     }
 
     clickedPair.push(key);
@@ -52,7 +53,7 @@ class Gallery extends React.Component {
 
     if (clickedPair.length == 2) {
       // setTimeout gets the 2nd clicked globe style to render
-      setTimeout(() => this.checkMatch(clickedPair), 500);
+      setTimeout(() => this.checkMatch(clickedPair), 300);
     }
   }
 
@@ -60,16 +61,17 @@ class Gallery extends React.Component {
     let imageNames = this.state.clickedPair.map(x => x.split(".jpg")[0]);
     if (imageNames[0] === imageNames[1]) {
       let finished = this.state.finished.slice().concat(clickedPair);
+      this.setState({finished: finished });
+      this.setState({clickedPair: Array() });
 
       if (finished.length == 2 * uniqueGlobesCount) {
-        this.setState({ finished: Array() });
-        this.setState({ imageUrls: getNewimageUrls(allLinks) });
-        alert("you win!");
-      } else {
-        this.setState({ finished: finished });
+        setTimeout(() => {
+          alert("you win!");
+          this.setState({ finished: Array() });
+          this.setState({ imageUrls: getNewimageUrls(allLinks) });
+        }, 200);
       }
     }
-    this.setState({ clickedPair: Array() });
   }
 
   renderImage(imageUrl, index) {
