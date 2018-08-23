@@ -1,3 +1,4 @@
+import allLinks from "../data.json";
 const baseUrl = "https://s3-us-west-1.amazonaws.com/marsfromspace.com/";
 
 var clickedStyles = {
@@ -42,7 +43,7 @@ class Gallery extends React.Component {
     }
   }
 
-  clickHandler(key) {
+  globeClickHandler(key) {
     if (this.state.finished.includes(key)) {
       return;
     }
@@ -104,7 +105,7 @@ class Gallery extends React.Component {
       <li
         key={key}
         style={this.clickIndicatorClassName(key)}
-        onClick={() => this.clickHandler(key)}
+        onClick={() => this.globeClickHandler(key)}
       >
         <section style={this.finishedIndicatorClassName(key)} className="stage">
           <figure
@@ -163,7 +164,7 @@ function getGameBoardUrls(allLinks) {
   let imageLinks = allLinks
     .slice(0, uniqueGlobesCount)
     .concat(allLinks.slice(0, uniqueGlobesCount));
-  return imageLinks.map(lnk => baseUrl + lnk.src.split("/").pop());
+  return imageLinks.map(lnk => baseUrl + lnk);
 }
 
 function startGame() {
@@ -180,10 +181,6 @@ function startGame() {
 
 // ready go
 const uniqueGlobesCount = getGlobesCount(); // number of unique globes, this will be times 2 for match game
-
-// grab all links from server-rendered html and remove from dom
-var allLinks = Array.prototype.slice.call(document.getElementsByTagName("img"));
-document.getElementById("prerendered").remove();
 
 const welcomeMsg =
   "Welcome! This is a visual matching game. Click on the pairs of matching globes.";

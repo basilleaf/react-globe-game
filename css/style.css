@@ -28,9 +28,6 @@ body {
 .win button:active {
   color: gray; }
 
-#prerendered {
-  display: none; }
-
 /* grid layout */
 ul {
   display: grid;
