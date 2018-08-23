@@ -8,11 +8,11 @@ body {
 
 .win {
   font-family: monospace;
-  margin: 20%;
-  font-size: 160%; }
+  margin: 20%; }
 
 .win h2 {
-  margin: 1em auto; }
+  margin: 1em auto;
+  font-weight: 400; }
 
 .win,
 .win button {
@@ -34,17 +34,20 @@ body {
 /* grid layout */
 ul {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(9rem, 2fr));
-  grid-gap: 1rem; }
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 2fr));
+  grid-gap: 0.1; }
 
+@media only screen and (min-device-width: 320px) and (max-device-width: 568px) and (-webkit-min-device-pixel-ratio: 2) {
+  ul {
+    grid-template-columns: repeat(4, minmax(5.9rem, 1fr)); } }
 ul > li {
   padding: 0;
   margin: 0;
   list-style-type: none; }
 
 .ball {
-  width: 9rem;
-  height: 9rem;
+  width: 10rem;
+  height: 10rem;
   margin: 0;
   padding: auto;
   border-radius: 50%;
@@ -53,6 +56,10 @@ ul > li {
   background-size: auto 50%;
   background: url("") repeat-x; }
 
+@media only screen and (min-device-width: 320px) and (max-device-width: 568px) and (-webkit-min-device-pixel-ratio: 2) {
+  .ball {
+    width: 5.9rem;
+    height: 5.9rem; } }
 .ball:before {
   content: "";
   position: absolute;

@@ -212,11 +212,15 @@ var MessageScreen = function (_React$Component2) {
 
 function getGlobesCount() {
   // try to fill the page
-  var globeSize = convertRemToPixels(9); // css .ball width/height
   var w = window.innerWidth;
   var h = window.innerHeight;
-  var colCount = Math.floor(w / (1.1 * globeSize)); // multiplier is just a guess
-  var rowCount = Math.floor(h / (1.1 * globeSize)); // to account for padding
+  var globeSizeRem = 10; // css .ball width/height (ish) (this is janky guesswork)
+  if (w < 569) {
+    globeSizeRem = 5.6;
+  }
+  var globeSize = convertRemToPixels(globeSizeRem);
+  var colCount = Math.floor(w / globeSize); //
+  var rowCount = Math.floor(h / globeSize); //
 
   return Math.floor(colCount * rowCount / 2);
 }

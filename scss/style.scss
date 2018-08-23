@@ -1,7 +1,8 @@
 $background-color: black;
 // $container-size: 8rem; // 127px; // 106px;
-$ball-size: 9rem;
-$grid-gap: 1rem;
+$ball-size: 10rem;
+$ball-size-mobile: 5.9rem;
+$grid-gap: 0.1;
 
 html * {
   margin: 0;
@@ -16,11 +17,12 @@ body {
 .win {
   font-family: monospace;
   margin: 20%;
-  font-size: 160%;
 }
 .win h2 {
   margin: 1em auto;
+  font-weight: 400;
 }
+
 .win,
 .win button {
   font-size: 110%;
@@ -49,6 +51,12 @@ ul {
   // grid-auto-rows: $container-size;
   // grid-auto-columns: $container-size;
 }
+@media only screen and (min-device-width: 320px) and (max-device-width: 568px) and (-webkit-min-device-pixel-ratio: 2) {
+  ul {
+    grid-template-columns: repeat(4, minmax($ball-size-mobile, 1fr));
+  }
+}
+
 ul > li {
   padding: 0;
   margin: 0;
@@ -68,6 +76,12 @@ ul > li {
   -webkit-transform-style: preserve-3d;
   background-size: auto 50%;
   background: url("") repeat-x;
+}
+@media only screen and (min-device-width: 320px) and (max-device-width: 568px) and (-webkit-min-device-pixel-ratio: 2) {
+  .ball {
+    width: $ball-size-mobile;
+    height: $ball-size-mobile;
+  }
 }
 
 .ball:before {
