@@ -1,17 +1,18 @@
 import allLinks from "../data.json";
 const baseUrl = "https://s3-us-west-1.amazonaws.com/marsfromspace.com/";
 
-/* styles */
+const welcomeMsg =
+  "Welcome! This is a visual matching game. Click on the pairs of matching globes.";
 
+/* globe behavior styles */
 var clickedStyles = {
   clicked: {
-    border: "1px solid gray"
+    border: "1px solid #525C65"
   },
   default: {
     border: "1px solid black"
   }
 };
-
 var finishedStyles = {
   finished: {
     display: "none"
@@ -20,13 +21,7 @@ var finishedStyles = {
 
 /* components */
 class MessageScreen extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      visitedCount: 0
-    };
-  }
-
+  /* interstitial screen for welcome and between games */
   render() {
     var styleName = this.props.display ? "block" : "none";
     return (
@@ -39,6 +34,7 @@ class MessageScreen extends React.Component {
 }
 
 class Gallery extends React.Component {
+  /* gallery of globe images is the matching game board */
   constructor(props) {
     super(props);
     this.state = {
@@ -48,72 +44,79 @@ class Gallery extends React.Component {
     };
   }
 
-  startOver() {
-    this.setState({ finished: Array() });
-    this.setState({ imageUrls: getGameBoardUrls(allLinks) });
-    this.renderStartOver(false, "", "");
-  }
-
-  clickIndicatorClassName(key) {
-    return this.state.clicked.includes(key)
-      ? clickedStyles.clicked
-      : clickedStyles.default;
-  }
-  finishedIndicatorClassName(key) {
-    if (this.state.finished.includes(key)) {
-      return finishedStyles.finished;
-    }
-  }
-
   globeClickHandler(key) {
+    /* a globe was clicked */
     if (this.state.finished.includes(key)) {
-      return;
+      return; // prevents clicking in the space of a removed globe
     }
     let clicked = this.state.clicked.slice();
-
     if (clicked[0] == key) {
       // they clicked the same box again, unset it
       this.setState({ clicked: Array() });
       return;
     }
-
+    // this is a legit clicked thing..
     clicked.push(key);
     this.setState({ clicked: clicked });
-
     if (clicked.length == 2) {
-      // setTimeout gets the 2nd clicked globe style to render
-      setTimeout(() => this.checkMatch(clicked), 300);
+      // a pair has been selected..
+      // setTimeout allows 2nd clicked globe style to render
+      setTimeout(() => this.pairHandler(clicked), 300);
     }
   }
 
-  checkMatch(clicked) {
+  pairHandler(clicked) {
+    /* player selected a pair, check for matching
+       and handle match game play behavior */
+
+    // image names are found in the file name, but the extensions may differ
+    // (an index is appended to make them unique on the board as "key")
     let imageNames = this.state.clicked.map(x => x.split(".jpg")[0]);
-    this.setState({ clicked: Array() }); // resets clicked pair highlighting
+
+    this.setState({ clicked: Array() });
 
     if (imageNames[0] !== imageNames[1]) {
       return; // these do not match
     }
 
-    // we have a match..
+    // we have a match, update the finished list..
     let finished = this.state.finished.slice().concat(clicked);
     this.setState({ finished: finished });
 
     if (finished.length == 2 * uniqueGlobesCount) {
-      // all matches on the board have been found
+      // there are no more globes to match! ask user to play again..
       setTimeout(() => {
-        this.renderStartOver(true, "good job!", "play again");
+        this.renderMessageScreen(true, "good job!", "play again");
       }, 200);
     }
   }
 
-  renderStartOver(display, msg, btnMsg) {
+  playAgainHandler() {
+    /* "play again" button handler */
+    this.setState({ finished: Array() });
+    this.setState({ imageUrls: getGameBoardUrls(allLinks) });
+    this.renderMessageScreen(false, "", "");
+  }
+
+  getGlobeStyle(key) {
+    return this.state.clicked.includes(key)
+      ? clickedStyles.clicked
+      : clickedStyles.default;
+  }
+  getFinishedStyle(key) {
+    if (this.state.finished.includes(key)) {
+      return finishedStyles.finished;
+    }
+  }
+
+  renderMessageScreen(display, msg, btnMsg) {
     ReactDOM.render(
       <MessageScreen
         display={display}
         msg={msg}
         btnMsg={btnMsg}
         restartHandler={() => {
-          this.startOver();
+          this.playAgainHandler();
         }}
       />,
       document.getElementById("msg")
@@ -126,10 +129,10 @@ class Gallery extends React.Component {
     return (
       <li
         key={key}
-        style={this.clickIndicatorClassName(key)}
+        style={this.getGlobeStyle(key)}
         onClick={() => this.globeClickHandler(key)}
       >
-        <section style={this.finishedIndicatorClassName(key)} className="stage">
+        <section style={this.getFinishedStyle(key)} className="stage">
           <figure
             className="ball"
             style={{ background: "url('" + imageUrl + "') repeat-x" }}
@@ -198,11 +201,8 @@ function startGame() {
   );
 }
 
-// ready go
+/* ok ready go */
 const uniqueGlobesCount = getGlobesCount();
-
-const welcomeMsg =
-  "Welcome! This is a visual matching game. Click on the pairs of matching globes.";
 
 ReactDOM.render(
   <MessageScreen

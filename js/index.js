@@ -12,17 +12,17 @@ var allLinks = ["ESP_013368_1885.jpg", "ESP_013954_1780.jpg", "ESP_014185_1095.j
 
 var baseUrl = "https://s3-us-west-1.amazonaws.com/marsfromspace.com/";
 
-/* styles */
+var welcomeMsg = "Welcome! This is a visual matching game. Click on the pairs of matching globes.";
 
+/* globe behavior styles */
 var clickedStyles = {
   clicked: {
-    border: "1px solid gray"
+    border: "1px solid #525C65"
   },
   default: {
     border: "1px solid black"
   }
 };
-
 var finishedStyles = {
   finished: {
     display: "none"
@@ -34,19 +34,16 @@ var finishedStyles = {
 var MessageScreen = function (_React$Component) {
   _inherits(MessageScreen, _React$Component);
 
-  function MessageScreen(props) {
+  function MessageScreen() {
     _classCallCheck(this, MessageScreen);
 
-    var _this = _possibleConstructorReturn(this, (MessageScreen.__proto__ || Object.getPrototypeOf(MessageScreen)).call(this, props));
-
-    _this.state = {
-      visitedCount: 0
-    };
-    return _this;
+    return _possibleConstructorReturn(this, (MessageScreen.__proto__ || Object.getPrototypeOf(MessageScreen)).apply(this, arguments));
   }
 
   _createClass(MessageScreen, [{
     key: "render",
+
+    /* interstitial screen for welcome and between games */
     value: function render() {
       var styleName = this.props.display ? "block" : "none";
       return React.createElement(
@@ -72,6 +69,7 @@ var MessageScreen = function (_React$Component) {
 var Gallery = function (_React$Component2) {
   _inherits(Gallery, _React$Component2);
 
+  /* gallery of globe images is the matching game board */
   function Gallery(props) {
     _classCallCheck(this, Gallery);
 
@@ -86,78 +84,85 @@ var Gallery = function (_React$Component2) {
   }
 
   _createClass(Gallery, [{
-    key: "startOver",
-    value: function startOver() {
-      this.setState({ finished: Array() });
-      this.setState({ imageUrls: getGameBoardUrls(allLinks) });
-      this.renderStartOver(false, "", "");
-    }
-  }, {
-    key: "clickIndicatorClassName",
-    value: function clickIndicatorClassName(key) {
-      return this.state.clicked.includes(key) ? clickedStyles.clicked : clickedStyles.default;
-    }
-  }, {
-    key: "finishedIndicatorClassName",
-    value: function finishedIndicatorClassName(key) {
-      if (this.state.finished.includes(key)) {
-        return finishedStyles.finished;
-      }
-    }
-  }, {
     key: "globeClickHandler",
     value: function globeClickHandler(key) {
       var _this3 = this;
 
+      /* a globe was clicked */
       if (this.state.finished.includes(key)) {
-        return;
+        return; // prevents clicking in the space of a removed globe
       }
       var clicked = this.state.clicked.slice();
-
       if (clicked[0] == key) {
         // they clicked the same box again, unset it
         this.setState({ clicked: Array() });
         return;
       }
-
+      // this is a legit clicked thing..
       clicked.push(key);
       this.setState({ clicked: clicked });
-
       if (clicked.length == 2) {
-        // setTimeout gets the 2nd clicked globe style to render
+        // a pair has been selected..
+        // setTimeout allows 2nd clicked globe style to render
         setTimeout(function () {
-          return _this3.checkMatch(clicked);
+          return _this3.pairHandler(clicked);
         }, 300);
       }
     }
   }, {
-    key: "checkMatch",
-    value: function checkMatch(clicked) {
+    key: "pairHandler",
+    value: function pairHandler(clicked) {
       var _this4 = this;
 
+      /* player selected a pair, check for matching
+         and handle match game play behavior */
+
+      // image names are found in the file name, but the extensions may differ
+      // (an index is appended to make them unique on the board as "key")
       var imageNames = this.state.clicked.map(function (x) {
         return x.split(".jpg")[0];
       });
-      this.setState({ clicked: Array() }); // resets clicked pair highlighting
+
+      this.setState({ clicked: Array() });
 
       if (imageNames[0] !== imageNames[1]) {
         return; // these do not match
       }
 
-      // we have a match..
+      // we have a match, update the finished list..
       var finished = this.state.finished.slice().concat(clicked);
       this.setState({ finished: finished });
 
       if (finished.length == 2 * uniqueGlobesCount) {
-        // all matches on the board have been found
+        // there are no more globes to match! ask user to play again..
         setTimeout(function () {
-          _this4.renderStartOver(true, "good job!", "play again");
+          _this4.renderMessageScreen(true, "good job!", "play again");
         }, 200);
       }
     }
   }, {
-    key: "renderStartOver",
-    value: function renderStartOver(display, msg, btnMsg) {
+    key: "playAgainHandler",
+    value: function playAgainHandler() {
+      /* "play again" button handler */
+      this.setState({ finished: Array() });
+      this.setState({ imageUrls: getGameBoardUrls(allLinks) });
+      this.renderMessageScreen(false, "", "");
+    }
+  }, {
+    key: "getGlobeStyle",
+    value: function getGlobeStyle(key) {
+      return this.state.clicked.includes(key) ? clickedStyles.clicked : clickedStyles.default;
+    }
+  }, {
+    key: "getFinishedStyle",
+    value: function getFinishedStyle(key) {
+      if (this.state.finished.includes(key)) {
+        return finishedStyles.finished;
+      }
+    }
+  }, {
+    key: "renderMessageScreen",
+    value: function renderMessageScreen(display, msg, btnMsg) {
       var _this5 = this;
 
       ReactDOM.render(React.createElement(MessageScreen, {
@@ -165,7 +170,7 @@ var Gallery = function (_React$Component2) {
         msg: msg,
         btnMsg: btnMsg,
         restartHandler: function restartHandler() {
-          _this5.startOver();
+          _this5.playAgainHandler();
         }
       }), document.getElementById("msg"));
     }
@@ -180,14 +185,14 @@ var Gallery = function (_React$Component2) {
         "li",
         {
           key: key,
-          style: this.clickIndicatorClassName(key),
+          style: this.getGlobeStyle(key),
           onClick: function onClick() {
             return _this6.globeClickHandler(key);
           }
         },
         React.createElement(
           "section",
-          { style: this.finishedIndicatorClassName(key), className: "stage" },
+          { style: this.getFinishedStyle(key), className: "stage" },
           React.createElement(
             "figure",
             {
@@ -257,10 +262,8 @@ function startGame() {
   ReactDOM.render(React.createElement(Gallery, { imageUrls: allLinks }), document.getElementById("root"));
 }
 
-// ready go
+/* ok ready go */
 var uniqueGlobesCount = getGlobesCount();
-
-var welcomeMsg = "Welcome! This is a visual matching game. Click on the pairs of matching globes.";
 
 ReactDOM.render(React.createElement(MessageScreen, {
   display: true,
