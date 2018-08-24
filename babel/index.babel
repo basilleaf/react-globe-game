@@ -135,7 +135,7 @@ class Gallery extends React.Component {
         <section style={this.getFinishedStyle(key)} className="stage">
           <figure
             className="ball"
-            style={{ background: "url('" + imageUrl + "') repeat-x" }}
+            style={{ background: "url('" + imageUrl + "') repeat-x center" }}
           >
             <span className="shadow" />
           </figure>

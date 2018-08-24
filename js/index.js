@@ -197,7 +197,7 @@ var Gallery = function (_React$Component2) {
             "figure",
             {
               className: "ball",
-              style: { background: "url('" + imageUrl + "') repeat-x" }
+              style: { background: "url('" + imageUrl + "') repeat-x center" }
             },
             React.createElement("span", { className: "shadow" })
           )
