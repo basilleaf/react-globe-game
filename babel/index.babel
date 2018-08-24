@@ -1,9 +1,11 @@
 import allLinks from "../data.json";
 const baseUrl = "https://s3-us-west-1.amazonaws.com/marsfromspace.com/";
 
+/* styles */
+
 var clickedStyles = {
   clicked: {
-    border: "1px solid white"
+    border: "1px solid gray"
   },
   default: {
     border: "1px solid black"
@@ -16,11 +18,31 @@ var finishedStyles = {
   }
 };
 
+/* components */
+class MessageScreen extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      visitedCount: 0
+    };
+  }
+
+  render() {
+    var styleName = this.props.display ? "block" : "none";
+    return (
+      <div className="win" style={{ display: styleName }}>
+        <h2>{this.props.msg}</h2>
+        <button onClick={this.props.restartHandler}>{this.props.btnMsg}</button>
+      </div>
+    );
+  }
+}
+
 class Gallery extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      clickedPair: Array(),
+      clicked: Array(),
       finished: Array(),
       imageUrls: getGameBoardUrls(allLinks)
     };
@@ -33,7 +55,7 @@ class Gallery extends React.Component {
   }
 
   clickIndicatorClassName(key) {
-    return this.state.clickedPair.includes(key)
+    return this.state.clicked.includes(key)
       ? clickedStyles.clicked
       : clickedStyles.default;
   }
@@ -47,33 +69,33 @@ class Gallery extends React.Component {
     if (this.state.finished.includes(key)) {
       return;
     }
-    let clickedPair = this.state.clickedPair.slice();
+    let clicked = this.state.clicked.slice();
 
-    if (clickedPair[0] == key) {
+    if (clicked[0] == key) {
       // they clicked the same box again, unset it
-      this.setState({ clickedPair: Array() });
+      this.setState({ clicked: Array() });
       return;
     }
 
-    clickedPair.push(key);
-    this.setState({ clickedPair: clickedPair });
+    clicked.push(key);
+    this.setState({ clicked: clicked });
 
-    if (clickedPair.length == 2) {
+    if (clicked.length == 2) {
       // setTimeout gets the 2nd clicked globe style to render
-      setTimeout(() => this.checkMatch(clickedPair), 300);
+      setTimeout(() => this.checkMatch(clicked), 300);
     }
   }
 
-  checkMatch(clickedPair) {
-    let imageNames = this.state.clickedPair.map(x => x.split(".jpg")[0]);
-    this.setState({ clickedPair: Array() }); // resets clicked pair highlighting
+  checkMatch(clicked) {
+    let imageNames = this.state.clicked.map(x => x.split(".jpg")[0]);
+    this.setState({ clicked: Array() }); // resets clicked pair highlighting
 
     if (imageNames[0] !== imageNames[1]) {
       return; // these do not match
     }
 
     // we have a match..
-    let finished = this.state.finished.slice().concat(clickedPair);
+    let finished = this.state.finished.slice().concat(clicked);
     this.setState({ finished: finished });
 
     if (finished.length == 2 * uniqueGlobesCount) {
@@ -132,25 +154,15 @@ class Gallery extends React.Component {
   }
 }
 
-class MessageScreen extends React.Component {
-  render() {
-    var styleName = this.props.display ? "block" : "none";
-    return (
-      <div className="win" style={{ display: styleName }}>
-        <h2>{this.props.msg}</h2>
-        <button onClick={this.props.restartHandler}>{this.props.btnMsg}</button>
-      </div>
-    );
-  }
-}
-
 function getGlobesCount() {
-  // try to fill the page
+  /* tries to guess how many unique globes are needed
+     to fill the screen so gallery doesn't require scrolling  */
   var w = window.innerWidth;
   var h = window.innerHeight;
   var globeSizeRem = 10; // css .ball width/height (ish) (this is janky guesswork)
   if (w < 569) {
-    globeSizeRem = 5.6;
+    // iphone media query width
+    globeSizeRem = 5.6; // this was tweaked and may not match globe size in scss
   }
   var globeSize = convertRemToPixels(globeSizeRem);
   var colCount = Math.floor(w / globeSize); //
@@ -160,19 +172,26 @@ function getGlobesCount() {
 }
 
 function getGameBoardUrls(allLinks) {
+  /* the gameboard presents a random
+     subset of the available images from data.json,
+     based on available screen size */
   allLinks = shuffle(allLinks);
-  let imageLinks = allLinks
-    .slice(0, uniqueGlobesCount)
-    .concat(allLinks.slice(0, uniqueGlobesCount));
+  let imageLinks = shuffle(
+    allLinks
+      .slice(0, uniqueGlobesCount)
+      .concat(allLinks.slice(0, uniqueGlobesCount))
+  );
   return imageLinks.map(lnk => baseUrl + lnk);
 }
 
 function startGame() {
+  /* hide the message screen */
   ReactDOM.render(
     <MessageScreen display={false} />,
     document.getElementById("msg")
   );
 
+  /* render the gallery  */
   ReactDOM.render(
     <Gallery imageUrls={allLinks} />,
     document.getElementById("root")
@@ -180,7 +199,7 @@ function startGame() {
 }
 
 // ready go
-const uniqueGlobesCount = getGlobesCount(); // number of unique globes, this will be times 2 for match game
+const uniqueGlobesCount = getGlobesCount();
 
 const welcomeMsg =
   "Welcome! This is a visual matching game. Click on the pairs of matching globes.";

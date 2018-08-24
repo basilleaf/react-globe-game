@@ -12,9 +12,11 @@ var allLinks = ["ESP_013368_1885.jpg", "ESP_013954_1780.jpg", "ESP_014185_1095.j
 
 var baseUrl = "https://s3-us-west-1.amazonaws.com/marsfromspace.com/";
 
+/* styles */
+
 var clickedStyles = {
   clicked: {
-    border: "1px solid white"
+    border: "1px solid gray"
   },
   default: {
     border: "1px solid black"
@@ -27,165 +29,20 @@ var finishedStyles = {
   }
 };
 
-var Gallery = function (_React$Component) {
-  _inherits(Gallery, _React$Component);
+/* components */
 
-  function Gallery(props) {
-    _classCallCheck(this, Gallery);
+var MessageScreen = function (_React$Component) {
+  _inherits(MessageScreen, _React$Component);
 
-    var _this = _possibleConstructorReturn(this, (Gallery.__proto__ || Object.getPrototypeOf(Gallery)).call(this, props));
-
-    _this.state = {
-      clickedPair: Array(),
-      finished: Array(),
-      imageUrls: getGameBoardUrls(allLinks)
-    };
-    return _this;
-  }
-
-  _createClass(Gallery, [{
-    key: "startOver",
-    value: function startOver() {
-      this.setState({ finished: Array() });
-      this.setState({ imageUrls: getGameBoardUrls(allLinks) });
-      this.renderStartOver(false, "", "");
-    }
-  }, {
-    key: "clickIndicatorClassName",
-    value: function clickIndicatorClassName(key) {
-      return this.state.clickedPair.includes(key) ? clickedStyles.clicked : clickedStyles.default;
-    }
-  }, {
-    key: "finishedIndicatorClassName",
-    value: function finishedIndicatorClassName(key) {
-      if (this.state.finished.includes(key)) {
-        return finishedStyles.finished;
-      }
-    }
-  }, {
-    key: "globeClickHandler",
-    value: function globeClickHandler(key) {
-      var _this2 = this;
-
-      if (this.state.finished.includes(key)) {
-        return;
-      }
-      var clickedPair = this.state.clickedPair.slice();
-
-      if (clickedPair[0] == key) {
-        // they clicked the same box again, unset it
-        this.setState({ clickedPair: Array() });
-        return;
-      }
-
-      clickedPair.push(key);
-      this.setState({ clickedPair: clickedPair });
-
-      if (clickedPair.length == 2) {
-        // setTimeout gets the 2nd clicked globe style to render
-        setTimeout(function () {
-          return _this2.checkMatch(clickedPair);
-        }, 300);
-      }
-    }
-  }, {
-    key: "checkMatch",
-    value: function checkMatch(clickedPair) {
-      var _this3 = this;
-
-      var imageNames = this.state.clickedPair.map(function (x) {
-        return x.split(".jpg")[0];
-      });
-      this.setState({ clickedPair: Array() }); // resets clicked pair highlighting
-
-      if (imageNames[0] !== imageNames[1]) {
-        return; // these do not match
-      }
-
-      // we have a match..
-      var finished = this.state.finished.slice().concat(clickedPair);
-      this.setState({ finished: finished });
-
-      if (finished.length == 2 * uniqueGlobesCount) {
-        // all matches on the board have been found
-        setTimeout(function () {
-          _this3.renderStartOver(true, "good job!", "play again");
-        }, 200);
-      }
-    }
-  }, {
-    key: "renderStartOver",
-    value: function renderStartOver(display, msg, btnMsg) {
-      var _this4 = this;
-
-      ReactDOM.render(React.createElement(MessageScreen, {
-        display: display,
-        msg: msg,
-        btnMsg: btnMsg,
-        restartHandler: function restartHandler() {
-          _this4.startOver();
-        }
-      }), document.getElementById("msg"));
-    }
-  }, {
-    key: "renderGlobe",
-    value: function renderGlobe(imageUrl, index) {
-      var _this5 = this;
-
-      var key = imageUrl.split("/").pop() + String(index); // unique key
-
-      return React.createElement(
-        "li",
-        {
-          key: key,
-          style: this.clickIndicatorClassName(key),
-          onClick: function onClick() {
-            return _this5.globeClickHandler(key);
-          }
-        },
-        React.createElement(
-          "section",
-          { style: this.finishedIndicatorClassName(key), className: "stage" },
-          React.createElement(
-            "figure",
-            {
-              className: "ball",
-              style: { background: "url('" + imageUrl + "') repeat-x" }
-            },
-            React.createElement("span", { className: "shadow" })
-          )
-        )
-      );
-    }
-  }, {
-    key: "render",
-    value: function render() {
-      var _this6 = this;
-
-      return React.createElement(
-        "div",
-        { className: "gallery" },
-        React.createElement(
-          "ul",
-          { className: "images" },
-          this.state.imageUrls.map(function (imageUrl, index) {
-            return _this6.renderGlobe(imageUrl, index);
-          })
-        )
-      );
-    }
-  }]);
-
-  return Gallery;
-}(React.Component);
-
-var MessageScreen = function (_React$Component2) {
-  _inherits(MessageScreen, _React$Component2);
-
-  function MessageScreen() {
+  function MessageScreen(props) {
     _classCallCheck(this, MessageScreen);
 
-    return _possibleConstructorReturn(this, (MessageScreen.__proto__ || Object.getPrototypeOf(MessageScreen)).apply(this, arguments));
+    var _this = _possibleConstructorReturn(this, (MessageScreen.__proto__ || Object.getPrototypeOf(MessageScreen)).call(this, props));
+
+    _this.state = {
+      visitedCount: 0
+    };
+    return _this;
   }
 
   _createClass(MessageScreen, [{
@@ -212,13 +69,167 @@ var MessageScreen = function (_React$Component2) {
   return MessageScreen;
 }(React.Component);
 
+var Gallery = function (_React$Component2) {
+  _inherits(Gallery, _React$Component2);
+
+  function Gallery(props) {
+    _classCallCheck(this, Gallery);
+
+    var _this2 = _possibleConstructorReturn(this, (Gallery.__proto__ || Object.getPrototypeOf(Gallery)).call(this, props));
+
+    _this2.state = {
+      clicked: Array(),
+      finished: Array(),
+      imageUrls: getGameBoardUrls(allLinks)
+    };
+    return _this2;
+  }
+
+  _createClass(Gallery, [{
+    key: "startOver",
+    value: function startOver() {
+      this.setState({ finished: Array() });
+      this.setState({ imageUrls: getGameBoardUrls(allLinks) });
+      this.renderStartOver(false, "", "");
+    }
+  }, {
+    key: "clickIndicatorClassName",
+    value: function clickIndicatorClassName(key) {
+      return this.state.clicked.includes(key) ? clickedStyles.clicked : clickedStyles.default;
+    }
+  }, {
+    key: "finishedIndicatorClassName",
+    value: function finishedIndicatorClassName(key) {
+      if (this.state.finished.includes(key)) {
+        return finishedStyles.finished;
+      }
+    }
+  }, {
+    key: "globeClickHandler",
+    value: function globeClickHandler(key) {
+      var _this3 = this;
+
+      if (this.state.finished.includes(key)) {
+        return;
+      }
+      var clicked = this.state.clicked.slice();
+
+      if (clicked[0] == key) {
+        // they clicked the same box again, unset it
+        this.setState({ clicked: Array() });
+        return;
+      }
+
+      clicked.push(key);
+      this.setState({ clicked: clicked });
+
+      if (clicked.length == 2) {
+        // setTimeout gets the 2nd clicked globe style to render
+        setTimeout(function () {
+          return _this3.checkMatch(clicked);
+        }, 300);
+      }
+    }
+  }, {
+    key: "checkMatch",
+    value: function checkMatch(clicked) {
+      var _this4 = this;
+
+      var imageNames = this.state.clicked.map(function (x) {
+        return x.split(".jpg")[0];
+      });
+      this.setState({ clicked: Array() }); // resets clicked pair highlighting
+
+      if (imageNames[0] !== imageNames[1]) {
+        return; // these do not match
+      }
+
+      // we have a match..
+      var finished = this.state.finished.slice().concat(clicked);
+      this.setState({ finished: finished });
+
+      if (finished.length == 2 * uniqueGlobesCount) {
+        // all matches on the board have been found
+        setTimeout(function () {
+          _this4.renderStartOver(true, "good job!", "play again");
+        }, 200);
+      }
+    }
+  }, {
+    key: "renderStartOver",
+    value: function renderStartOver(display, msg, btnMsg) {
+      var _this5 = this;
+
+      ReactDOM.render(React.createElement(MessageScreen, {
+        display: display,
+        msg: msg,
+        btnMsg: btnMsg,
+        restartHandler: function restartHandler() {
+          _this5.startOver();
+        }
+      }), document.getElementById("msg"));
+    }
+  }, {
+    key: "renderGlobe",
+    value: function renderGlobe(imageUrl, index) {
+      var _this6 = this;
+
+      var key = imageUrl.split("/").pop() + String(index); // unique key
+
+      return React.createElement(
+        "li",
+        {
+          key: key,
+          style: this.clickIndicatorClassName(key),
+          onClick: function onClick() {
+            return _this6.globeClickHandler(key);
+          }
+        },
+        React.createElement(
+          "section",
+          { style: this.finishedIndicatorClassName(key), className: "stage" },
+          React.createElement(
+            "figure",
+            {
+              className: "ball",
+              style: { background: "url('" + imageUrl + "') repeat-x" }
+            },
+            React.createElement("span", { className: "shadow" })
+          )
+        )
+      );
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var _this7 = this;
+
+      return React.createElement(
+        "div",
+        { className: "gallery" },
+        React.createElement(
+          "ul",
+          { className: "images" },
+          this.state.imageUrls.map(function (imageUrl, index) {
+            return _this7.renderGlobe(imageUrl, index);
+          })
+        )
+      );
+    }
+  }]);
+
+  return Gallery;
+}(React.Component);
+
 function getGlobesCount() {
-  // try to fill the page
+  /* tries to guess how many unique globes are needed
+     to fill the screen so gallery doesn't require scrolling  */
   var w = window.innerWidth;
   var h = window.innerHeight;
   var globeSizeRem = 10; // css .ball width/height (ish) (this is janky guesswork)
   if (w < 569) {
-    globeSizeRem = 5.6;
+    // iphone media query width
+    globeSizeRem = 5.6; // this was tweaked and may not match globe size in scss
   }
   var globeSize = convertRemToPixels(globeSizeRem);
   var colCount = Math.floor(w / globeSize); //
@@ -228,21 +239,26 @@ function getGlobesCount() {
 }
 
 function getGameBoardUrls(allLinks) {
+  /* the gameboard presents a random
+     subset of the available images from data.json,
+     based on available screen size */
   allLinks = shuffle(allLinks);
-  var imageLinks = allLinks.slice(0, uniqueGlobesCount).concat(allLinks.slice(0, uniqueGlobesCount));
+  var imageLinks = shuffle(allLinks.slice(0, uniqueGlobesCount).concat(allLinks.slice(0, uniqueGlobesCount)));
   return imageLinks.map(function (lnk) {
     return baseUrl + lnk;
   });
 }
 
 function startGame() {
+  /* hide the message screen */
   ReactDOM.render(React.createElement(MessageScreen, { display: false }), document.getElementById("msg"));
 
+  /* render the gallery  */
   ReactDOM.render(React.createElement(Gallery, { imageUrls: allLinks }), document.getElementById("root"));
 }
 
 // ready go
-var uniqueGlobesCount = getGlobesCount(); // number of unique globes, this will be times 2 for match game
+var uniqueGlobesCount = getGlobesCount();
 
 var welcomeMsg = "Welcome! This is a visual matching game. Click on the pairs of matching globes.";
 
