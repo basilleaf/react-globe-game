@@ -17,10 +17,10 @@ var welcomeMsg = "Welcome! This is a visual matching game. Click on the pairs of
 /* globe behavior styles */
 var clickedStyles = {
   clicked: {
-    border: "1px solid #525C65"
+    border: "2px solid #525C65"
   },
   default: {
-    border: "1px solid black"
+    border: "2px solid black"
   }
 };
 var finishedStyles = {
@@ -78,12 +78,39 @@ var Gallery = function (_React$Component2) {
     _this2.state = {
       clicked: Array(),
       finished: Array(),
-      imageUrls: getGameBoardUrls(allLinks)
+      imageUrls: Array(),
+      remainingLinks: Array()
     };
     return _this2;
   }
 
   _createClass(Gallery, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      this.setState({ imageUrls: this.getGameBoardUrls(allLinks) });
+    }
+  }, {
+    key: "getGameBoardUrls",
+    value: function getGameBoardUrls(links) {
+      /* the gameboard presents a random
+         subset of the available images from data.json,
+         based on available screen size */
+      links = shuffle(links);
+      var imageLinks = shuffle(links.slice(0, uniqueGlobesCount).concat(links.slice(0, uniqueGlobesCount)));
+      var remainingLinks = links.filter(function (x) {
+        return !imageLinks.includes(x);
+      });
+
+      // don't repeat images between games until there are no more,
+      // then start over with allLinks again..
+      remainingLinks = remainingLinks.length < uniqueGlobesCount ? allLinks : remainingLinks;
+
+      this.setState({ remainingLinks: remainingLinks });
+      return imageLinks.map(function (lnk) {
+        return baseUrl + lnk;
+      });
+    }
+  }, {
     key: "globeClickHandler",
     value: function globeClickHandler(key) {
       var _this3 = this;
@@ -145,7 +172,9 @@ var Gallery = function (_React$Component2) {
     value: function playAgainHandler() {
       /* "play again" button handler */
       this.setState({ finished: Array() });
-      this.setState({ imageUrls: getGameBoardUrls(allLinks) });
+      this.setState({
+        imageUrls: this.getGameBoardUrls(this.state.remainingLinks)
+      });
       this.renderMessageScreen(false, "", "");
     }
   }, {
@@ -241,17 +270,6 @@ function getGlobesCount() {
   var rowCount = Math.floor(h / globeSize); //
 
   return Math.floor(colCount * rowCount / 2);
-}
-
-function getGameBoardUrls(allLinks) {
-  /* the gameboard presents a random
-     subset of the available images from data.json,
-     based on available screen size */
-  allLinks = shuffle(allLinks);
-  var imageLinks = shuffle(allLinks.slice(0, uniqueGlobesCount).concat(allLinks.slice(0, uniqueGlobesCount)));
-  return imageLinks.map(function (lnk) {
-    return baseUrl + lnk;
-  });
 }
 
 function startGame() {
