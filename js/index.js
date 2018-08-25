@@ -79,7 +79,9 @@ var Gallery = function (_React$Component2) {
       clicked: Array(),
       finished: Array(),
       imageUrls: Array(),
-      remainingLinks: Array()
+      remainingLinks: Array(),
+      isUsingKeyboardNav: false,
+      focusStyle: "mouse"
     };
     return _this2;
   }
@@ -88,6 +90,7 @@ var Gallery = function (_React$Component2) {
     key: "componentDidMount",
     value: function componentDidMount() {
       this.setState({ imageUrls: this.getGameBoardUrls(allLinks) });
+      window.addEventListener("keyup", this.handleKeyUp.bind(this));
     }
   }, {
     key: "getGameBoardUrls",
@@ -171,6 +174,23 @@ var Gallery = function (_React$Component2) {
       }
     }
   }, {
+    key: "handleKeyUp",
+    value: function handleKeyUp(e) {
+      // are they trying to navigate with keyboard..
+      if (e.key != "Tab") {
+        return; // no
+      }
+
+      // yes
+      if (!this.state.isUsingKeyboardNav) {
+        this.setState({ isUsingKeyboardNav: true });
+
+        if (this.state.focusStyle == "mouse") {
+          this.setState({ focusStyle: "keyboard" });
+        }
+      }
+    }
+  }, {
     key: "playAgainHandler",
     value: function playAgainHandler() {
       /* "play again" button handler */
@@ -234,7 +254,7 @@ var Gallery = function (_React$Component2) {
               tabIndex: 0,
               role: "group",
               "aria-labelledby": key,
-              className: "ball",
+              className: "ball " + this.state.focusStyle,
               style: { background: "url('" + imageUrl + "') repeat-x center" }
             },
             React.createElement("span", { className: "shadow" })

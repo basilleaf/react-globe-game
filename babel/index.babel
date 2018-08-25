@@ -41,12 +41,14 @@ class Gallery extends React.Component {
       clicked: Array(),
       finished: Array(),
       imageUrls: Array(),
-      remainingLinks: Array()
+      remainingLinks: Array(),
+      isUsingKeyboardNav: false,
+      focusStyle: "mouse"
     };
   }
-
   componentDidMount() {
     this.setState({ imageUrls: this.getGameBoardUrls(allLinks) });
+    window.addEventListener("keyup", this.handleKeyUp.bind(this));
   }
 
   getGameBoardUrls(links) {
@@ -120,6 +122,22 @@ class Gallery extends React.Component {
     }
   }
 
+  handleKeyUp(e) {
+    // are they trying to navigate with keyboard..
+    if (e.key != "Tab") {
+      return; // no
+    }
+
+    // yes
+    if (!this.state.isUsingKeyboardNav) {
+      this.setState({ isUsingKeyboardNav: true });
+
+      if (this.state.focusStyle == "mouse") {
+        this.setState({ focusStyle: "keyboard" });
+      }
+    }
+  }
+
   playAgainHandler() {
     /* "play again" button handler */
     this.setState({ finished: Array() });
@@ -169,7 +187,7 @@ class Gallery extends React.Component {
             tabIndex={0}
             role="group"
             aria-labelledby={key}
-            className="ball"
+            className={"ball " + this.state.focusStyle}
             style={{ background: "url('" + imageUrl + "') repeat-x center" }}
           >
             <span className="shadow" />

@@ -42,6 +42,12 @@ ul > li {
   margin: 0;
   list-style-type: none; }
 
+.mouse:focus {
+  outline: none; }
+
+.keyboard:focus {
+  outline: 1px dotted #4d6275; }
+
 .ball {
   width: 10rem;
   height: 10rem;
