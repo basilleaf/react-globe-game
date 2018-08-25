@@ -112,10 +112,13 @@ var Gallery = function (_React$Component2) {
     }
   }, {
     key: "globeClickHandler",
-    value: function globeClickHandler(key) {
+    value: function globeClickHandler(key, e) {
       var _this3 = this;
 
       /* a globe was clicked */
+      if (e.key & ![" ", "Enter"].includes(e.key)) {
+        return; // this was not an enter or spacebar click
+      }
       if (this.state.finished.includes(key)) {
         return; // prevents clicking in the space of a removed globe
       }
@@ -215,8 +218,11 @@ var Gallery = function (_React$Component2) {
         {
           key: key,
           style: this.getGlobeStyle(key),
-          onClick: function onClick() {
-            return _this6.globeClickHandler(key);
+          onClick: function onClick(e) {
+            return _this6.globeClickHandler(key, e);
+          },
+          onKeyPress: function onKeyPress(e) {
+            return _this6.globeClickHandler(key, e);
           }
         },
         React.createElement(
@@ -225,6 +231,9 @@ var Gallery = function (_React$Component2) {
           React.createElement(
             "figure",
             {
+              tabIndex: index + 1,
+              role: "group",
+              "aria-labelledby": key + "." + index,
               className: "ball",
               style: { background: "url('" + imageUrl + "') repeat-x center" }
             },

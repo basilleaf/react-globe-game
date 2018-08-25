@@ -70,8 +70,11 @@ class Gallery extends React.Component {
     return imageLinks.map(lnk => baseUrl + lnk);
   }
 
-  globeClickHandler(key) {
+  globeClickHandler(key, e) {
     /* a globe was clicked */
+    if (e.key & ![" ", "Enter"].includes(e.key)) {
+      return; // this was not an enter or spacebar click
+    }
     if (this.state.finished.includes(key)) {
       return; // prevents clicking in the space of a removed globe
     }
@@ -158,10 +161,14 @@ class Gallery extends React.Component {
       <li
         key={key}
         style={this.getGlobeStyle(key)}
-        onClick={() => this.globeClickHandler(key)}
+        onClick={e => this.globeClickHandler(key, e)}
+        onKeyPress={e => this.globeClickHandler(key, e)}
       >
         <section style={this.getFinishedStyle(key)} className="stage">
           <figure
+            tabIndex={index + 1}
+            role="group"
+            aria-labelledby={key + "." + index}
             className="ball"
             style={{ background: "url('" + imageUrl + "') repeat-x center" }}
           >
