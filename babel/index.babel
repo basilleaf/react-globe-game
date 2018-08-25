@@ -166,9 +166,9 @@ class Gallery extends React.Component {
       >
         <section style={this.getFinishedStyle(key)} className="stage">
           <figure
-            tabIndex={index + 1}
+            tabIndex={0}
             role="group"
-            aria-labelledby={key + "." + index}
+            aria-labelledby={key}
             className="ball"
             style={{ background: "url('" + imageUrl + "') repeat-x center" }}
           >

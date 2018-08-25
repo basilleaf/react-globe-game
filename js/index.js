@@ -231,9 +231,9 @@ var Gallery = function (_React$Component2) {
           React.createElement(
             "figure",
             {
-              tabIndex: index + 1,
+              tabIndex: 0,
               role: "group",
-              "aria-labelledby": key + "." + index,
+              "aria-labelledby": key,
               className: "ball",
               style: { background: "url('" + imageUrl + "') repeat-x center" }
             },
