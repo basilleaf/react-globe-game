@@ -17,10 +17,10 @@ var welcomeMsg = "Welcome! This is a visual matching game. Click on the pairs of
 /* globe behavior styles */
 var clickedStyles = {
   clicked: {
-    border: "2px solid #525C65"
+    border: "3px solid #525C65"
   },
   default: {
-    border: "2px solid black"
+    border: "3px solid black"
   }
 };
 var finishedStyles = {
@@ -118,6 +118,12 @@ var Gallery = function (_React$Component2) {
     value: function globeClickHandler(key, e) {
       var _this3 = this;
 
+      if (!e.key) {
+        // they switched back to using clicks/taps
+        if (this.state.focusStyle == "keyboard") {
+          this.setState({ focusStyle: "mouse" });
+        }
+      }
       /* a globe was clicked */
       if (e.key & ![" ", "Enter"].includes(e.key)) {
         return; // this was not an enter or spacebar click
@@ -176,7 +182,7 @@ var Gallery = function (_React$Component2) {
   }, {
     key: "handleKeyUp",
     value: function handleKeyUp(e) {
-      // are they trying to navigate with keyboard..
+      // they may be trying to navigate with keyboard..
       if (e.key != "Tab") {
         return; // no
       }
@@ -184,10 +190,10 @@ var Gallery = function (_React$Component2) {
       // yes
       if (!this.state.isUsingKeyboardNav) {
         this.setState({ isUsingKeyboardNav: true });
+      }
 
-        if (this.state.focusStyle == "mouse") {
-          this.setState({ focusStyle: "keyboard" });
-        }
+      if (this.state.focusStyle == "mouse") {
+        this.setState({ focusStyle: "keyboard" });
       }
     }
   }, {
