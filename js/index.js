@@ -45,10 +45,13 @@ var MessageScreen = function (_React$Component) {
 
     /* interstitial screen for welcome and between games */
     value: function render() {
+      if (!this.props.display) {
+        return null;
+      }
       var styleName = this.props.display ? "block" : "none";
       return React.createElement(
         "div",
-        { className: "win", style: { display: styleName } },
+        { className: "win" },
         React.createElement(
           "h2",
           null,

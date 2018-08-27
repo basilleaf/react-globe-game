@@ -28,7 +28,7 @@ class MessageScreen extends React.Component {
     }
     var styleName = this.props.display ? "block" : "none";
     return (
-      <div className="win"
+      <div className="win">
         <h2>{this.props.msg}</h2>
         <button onClick={this.props.restartHandler}>{this.props.btnMsg}</button>
       </div>
