@@ -12,7 +12,10 @@ html * {
 body {
   height: 100%;
 }
-
+.gallery {
+  width: 100%;
+  overflow: hidden;
+}
 // interstitial (win) screen styles
 .win {
   font-family: monospace;
