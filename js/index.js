@@ -76,6 +76,7 @@ var Gallery = function (_React$Component2) {
     var _this2 = _possibleConstructorReturn(this, (Gallery.__proto__ || Object.getPrototypeOf(Gallery)).call(this, props));
 
     _this2.state = {
+      display: true,
       clicked: Array(),
       finished: Array(),
       imageUrls: Array(),
@@ -173,6 +174,7 @@ var Gallery = function (_React$Component2) {
       this.setState({ finished: finished });
 
       if (finished.length == 2 * uniqueGlobesCount) {
+        this.setState({ display: false });
         // there are no more globes to match! ask user to play again..
         setTimeout(function () {
           _this4.renderMessageScreen(true, "good job!", "play again");
@@ -204,6 +206,7 @@ var Gallery = function (_React$Component2) {
       this.setState({
         imageUrls: this.getGameBoardUrls(this.state.remainingLinks)
       });
+      this.setState({ display: true });
       this.renderMessageScreen(false, "", "");
     }
   }, {
@@ -273,6 +276,9 @@ var Gallery = function (_React$Component2) {
     value: function render() {
       var _this7 = this;
 
+      if (!this.state.display) {
+        return null;
+      }
       return React.createElement(
         "div",
         { className: "gallery" },

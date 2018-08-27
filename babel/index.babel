@@ -23,9 +23,12 @@ var finishedStyles = {
 class MessageScreen extends React.Component {
   /* interstitial screen for welcome and between games */
   render() {
+    if (!this.props.display) {
+      return null;
+    }
     var styleName = this.props.display ? "block" : "none";
     return (
-      <div className="win" style={{ display: styleName }}>
+      <div className="win"
         <h2>{this.props.msg}</h2>
         <button onClick={this.props.restartHandler}>{this.props.btnMsg}</button>
       </div>
@@ -38,6 +41,7 @@ class Gallery extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      display: true,
       clicked: Array(),
       finished: Array(),
       imageUrls: Array(),
@@ -121,6 +125,7 @@ class Gallery extends React.Component {
     this.setState({ finished: finished });
 
     if (finished.length == 2 * uniqueGlobesCount) {
+      this.setState({ display: false });
       // there are no more globes to match! ask user to play again..
       setTimeout(() => {
         this.renderMessageScreen(true, "good job!", "play again");
@@ -150,6 +155,7 @@ class Gallery extends React.Component {
     this.setState({
       imageUrls: this.getGameBoardUrls(this.state.remainingLinks)
     });
+    this.setState({ display: true });
     this.renderMessageScreen(false, "", "");
   }
 
@@ -204,6 +210,9 @@ class Gallery extends React.Component {
   }
 
   render() {
+    if (!this.state.display) {
+      return null;
+    }
     return (
       <div className="gallery">
         <ul className="images">
