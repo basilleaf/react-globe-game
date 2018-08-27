@@ -45,6 +45,7 @@ class Gallery extends React.Component {
       clicked: Array(),
       finished: Array(),
       imageUrls: Array(),
+      boardKeys: Array(),
       remainingLinks: Array(),
       isUsingKeyboardNav: false,
       focusStyle: "mouse"
@@ -59,12 +60,14 @@ class Gallery extends React.Component {
     /* the gameboard presents a random
        subset of the available images from data.json,
        based on available screen size */
-    links = shuffle(links);
+    links = shuffle(links); // the big list of all links
     let imageLinks = shuffle(
       links
         .slice(0, uniqueGlobesCount)
         .concat(links.slice(0, uniqueGlobesCount))
     );
+    this.setState({ boardKeys: imageLinks }); // help for arrow key navigation
+
     let remainingLinks = links.filter(x => !imageLinks.includes(x));
 
     // don't repeat images between games until there are no more,
@@ -74,6 +77,57 @@ class Gallery extends React.Component {
 
     this.setState({ remainingLinks: remainingLinks });
     return imageLinks.map(lnk => baseUrl + lnk);
+  }
+
+  moveFocus(parentEl, direction) {
+    // moves focus from parentEl to next available globe
+    // el is the <li> element
+    // direction = next/prev (or right/left arrow key)
+
+    // find the appropriate next sibling (before or after this one)
+    var siblingContainer =
+      direction == "next" ? parentEl.nextSibling : parentEl.previousSibling;
+
+    try {
+      var siblingKey = siblingContainer.getAttribute("data-key");
+      if (this.state.finished.includes(siblingKey)) {
+        // this globe is hidden, move to next available sibling
+        return this.moveFocus(siblingContainer, direction);
+      }
+      // this is available, focus this element
+      siblingContainer.focus();
+    } catch (e) {
+      // this happens on the begnning and end of the list of globes
+      // the arrow keys have a wraparound behavior
+      var currentKey =
+        parentEl.getAttribute("data-key").split(".jpg")[0] + ".jpg";
+      let boardKeys = this.state.boardKeys;
+      if ((currentKey == boardKeys[0]) & (direction == "prev")) {
+        // they hit left arrow while on the first globe
+        // bring focus to last globe
+        document.getElementById("images").lastChild.focus();
+        // they are at the beginning of the list, send them to the end
+      }
+      if (
+        (currentKey == boardKeys[boardKeys.length - 1]) &
+        (direction == "next")
+      ) {
+        // they hit right arrow while on the last globe,
+        // bring focus to first globe
+        document.getElementById("images").firstChild.focus();
+      }
+    }
+  }
+
+  keyDownHandler(e) {
+    // for navigating with arrow key
+    if (!e.key | !["ArrowRight", "ArrowLeft"].includes(e.key)) {
+      return;
+    }
+    let parentEl = e.target; // the enclosing <li>
+    var direction = e.key == "ArrowLeft" ? "prev" : "next";
+
+    this.moveFocus(parentEl, direction);
   }
 
   globeClickHandler(key, e) {
@@ -100,13 +154,18 @@ class Gallery extends React.Component {
     clicked.push(key);
     this.setState({ clicked: clicked });
     if (clicked.length == 2) {
+      let el = e.target;
       // a pair has been selected..
       // setTimeout allows 2nd clicked globe style to render
-      setTimeout(() => this.pairHandler(clicked), 300);
+      setTimeout(() => {
+        this.pairHandler(clicked, el);
+      }, 300);
     }
   }
 
-  pairHandler(clicked) {
+  pairHandler(clicked, el) {
+    // el is the last dom element clicked
+
     /* player selected a pair, check for matching
        and handle match game play behavior */
 
@@ -122,7 +181,12 @@ class Gallery extends React.Component {
 
     // we have a match, update the finished list..
     let finished = this.state.finished.slice().concat(clicked);
-    this.setState({ finished: finished });
+    this.setState({ finished: finished }, () => {
+      // move focus to the next dom element for keyboard nav users
+      if (this.state.isUsingKeyboardNav) {
+        this.moveFocus(el, "next");
+      }
+    });
 
     if (finished.length == 2 * uniqueGlobesCount) {
       this.setState({ display: false });
@@ -138,12 +202,9 @@ class Gallery extends React.Component {
     if (e.key != "Tab") {
       return; // no
     }
-
-    // yes
     if (!this.state.isUsingKeyboardNav) {
       this.setState({ isUsingKeyboardNav: true });
     }
-
     if (this.state.focusStyle == "mouse") {
       this.setState({ focusStyle: "keyboard" });
     }
@@ -190,16 +251,20 @@ class Gallery extends React.Component {
     return (
       <li
         key={key}
+        tabIndex={0}
+        data-key={key}
         style={this.getGlobeStyle(key)}
+        className={this.state.focusStyle}
         onClick={e => this.globeClickHandler(key, e)}
         onKeyPress={e => this.globeClickHandler(key, e)}
+        onKeyDown={e => this.keyDownHandler(e)}
       >
         <section style={this.getFinishedStyle(key)} className="stage">
           <figure
-            tabIndex={0}
+            title={key}
             role="group"
             aria-labelledby={key}
-            className={"ball " + this.state.focusStyle}
+            className="ball"
             style={{ background: "url('" + imageUrl + "') repeat-x center" }}
           >
             <span className="shadow" />
@@ -215,7 +280,7 @@ class Gallery extends React.Component {
     }
     return (
       <div className="gallery">
-        <ul className="images">
+        <ul id="images" className="images">
           {this.state.imageUrls.map((imageUrl, index) =>
             this.renderGlobe(imageUrl, index)
           )}

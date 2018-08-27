@@ -39,7 +39,8 @@ ul {
     grid-template-columns: repeat(4, minmax(5.9rem, 1fr)); } }
 ul > li {
   padding: 0;
-  margin: 0;
+  margin: 3px;
+  margin-bottom: 0;
   list-style-type: none; }
 
 .mouse:focus {

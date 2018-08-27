@@ -83,6 +83,7 @@ var Gallery = function (_React$Component2) {
       clicked: Array(),
       finished: Array(),
       imageUrls: Array(),
+      boardKeys: Array(),
       remainingLinks: Array(),
       isUsingKeyboardNav: false,
       focusStyle: "mouse"
@@ -102,8 +103,10 @@ var Gallery = function (_React$Component2) {
       /* the gameboard presents a random
          subset of the available images from data.json,
          based on available screen size */
-      links = shuffle(links);
+      links = shuffle(links); // the big list of all links
       var imageLinks = shuffle(links.slice(0, uniqueGlobesCount).concat(links.slice(0, uniqueGlobesCount)));
+      this.setState({ boardKeys: imageLinks }); // help for arrow key navigation
+
       var remainingLinks = links.filter(function (x) {
         return !imageLinks.includes(x);
       });
@@ -116,6 +119,54 @@ var Gallery = function (_React$Component2) {
       return imageLinks.map(function (lnk) {
         return baseUrl + lnk;
       });
+    }
+  }, {
+    key: "moveFocus",
+    value: function moveFocus(parentEl, direction) {
+      // moves focus from parentEl to next available globe
+      // el is the <li> element
+      // direction = next/prev (or right/left arrow key)
+
+      // find the appropriate next sibling (before or after this one)
+      var siblingContainer = direction == "next" ? parentEl.nextSibling : parentEl.previousSibling;
+
+      try {
+        var siblingKey = siblingContainer.getAttribute("data-key");
+        if (this.state.finished.includes(siblingKey)) {
+          // this globe is hidden, move to next available sibling
+          return this.moveFocus(siblingContainer, direction);
+        }
+        // this is available, focus this element
+        siblingContainer.focus();
+      } catch (e) {
+        // this happens on the begnning and end of the list of globes
+        // the arrow keys have a wraparound behavior
+        var currentKey = parentEl.getAttribute("data-key").split(".jpg")[0] + ".jpg";
+        var boardKeys = this.state.boardKeys;
+        if (currentKey == boardKeys[0] & direction == "prev") {
+          // they hit left arrow while on the first globe
+          // bring focus to last globe
+          document.getElementById("images").lastChild.focus();
+          // they are at the beginning of the list, send them to the end
+        }
+        if (currentKey == boardKeys[boardKeys.length - 1] & direction == "next") {
+          // they hit right arrow while on the last globe,
+          // bring focus to first globe
+          document.getElementById("images").firstChild.focus();
+        }
+      }
+    }
+  }, {
+    key: "keyDownHandler",
+    value: function keyDownHandler(e) {
+      // for navigating with arrow key
+      if (!e.key | !["ArrowRight", "ArrowLeft"].includes(e.key)) {
+        return;
+      }
+      var parentEl = e.target; // the enclosing <li>
+      var direction = e.key == "ArrowLeft" ? "prev" : "next";
+
+      this.moveFocus(parentEl, direction);
     }
   }, {
     key: "globeClickHandler",
@@ -145,17 +196,20 @@ var Gallery = function (_React$Component2) {
       clicked.push(key);
       this.setState({ clicked: clicked });
       if (clicked.length == 2) {
+        var el = e.target;
         // a pair has been selected..
         // setTimeout allows 2nd clicked globe style to render
         setTimeout(function () {
-          return _this3.pairHandler(clicked);
+          _this3.pairHandler(clicked, el);
         }, 300);
       }
     }
   }, {
     key: "pairHandler",
-    value: function pairHandler(clicked) {
+    value: function pairHandler(clicked, el) {
       var _this4 = this;
+
+      // el is the last dom element clicked
 
       /* player selected a pair, check for matching
          and handle match game play behavior */
@@ -174,7 +228,12 @@ var Gallery = function (_React$Component2) {
 
       // we have a match, update the finished list..
       var finished = this.state.finished.slice().concat(clicked);
-      this.setState({ finished: finished });
+      this.setState({ finished: finished }, function () {
+        // move focus to the next dom element for keyboard nav users
+        if (_this4.state.isUsingKeyboardNav) {
+          _this4.moveFocus(el, "next");
+        }
+      });
 
       if (finished.length == 2 * uniqueGlobesCount) {
         this.setState({ display: false });
@@ -191,12 +250,9 @@ var Gallery = function (_React$Component2) {
       if (e.key != "Tab") {
         return; // no
       }
-
-      // yes
       if (!this.state.isUsingKeyboardNav) {
         this.setState({ isUsingKeyboardNav: true });
       }
-
       if (this.state.focusStyle == "mouse") {
         this.setState({ focusStyle: "keyboard" });
       }
@@ -249,12 +305,18 @@ var Gallery = function (_React$Component2) {
         "li",
         {
           key: key,
+          tabIndex: 0,
+          "data-key": key,
           style: this.getGlobeStyle(key),
+          className: this.state.focusStyle,
           onClick: function onClick(e) {
             return _this6.globeClickHandler(key, e);
           },
           onKeyPress: function onKeyPress(e) {
             return _this6.globeClickHandler(key, e);
+          },
+          onKeyDown: function onKeyDown(e) {
+            return _this6.keyDownHandler(e);
           }
         },
         React.createElement(
@@ -263,10 +325,10 @@ var Gallery = function (_React$Component2) {
           React.createElement(
             "figure",
             {
-              tabIndex: 0,
+              title: key,
               role: "group",
               "aria-labelledby": key,
-              className: "ball " + this.state.focusStyle,
+              className: "ball",
               style: { background: "url('" + imageUrl + "') repeat-x center" }
             },
             React.createElement("span", { className: "shadow" })
@@ -287,7 +349,7 @@ var Gallery = function (_React$Component2) {
         { className: "gallery" },
         React.createElement(
           "ul",
-          { className: "images" },
+          { id: "images", className: "images" },
           this.state.imageUrls.map(function (imageUrl, index) {
             return _this7.renderGlobe(imageUrl, index);
           })
