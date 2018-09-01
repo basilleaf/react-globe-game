@@ -1,0 +1,33 @@
+function getGlobesCount() {
+  /* tries to guess how many unique globes are needed
+     to fill the screen so gallery doesn't require scrolling  */
+  var w = window.innerWidth;
+  var h = window.innerHeight;
+  var globeSizeRem = 10; // css .ball width/height (ish) (this is janky guesswork)
+  if (w < 569) {
+    // iphone media query width
+    globeSizeRem = 5.6; // this was tweaked and may not match globe size in scss
+  }
+  var globeSize = convertRemToPixels(globeSizeRem);
+  var colCount = Math.floor(w / globeSize); //
+  var rowCount = Math.floor(h / globeSize); //
+
+  return Math.floor(colCount * rowCount / 2);
+}
+
+function startGame() {
+  /* hide the message screen */
+
+  ReactDOM.render(
+    <MessageScreen display={false} />,
+    document.getElementById("msg")
+  );
+
+  /* render the gallery  */
+  ReactDOM.render(
+    <Gallery imageUrls={allLinks} />,
+    document.getElementById("root")
+  );
+}
+
+

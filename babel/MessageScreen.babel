@@ -1,0 +1,14 @@
+const MessageScreen = props => {
+  /* interstitial screen for welcome and between games */
+  if (!props.display) {
+    return null;
+  }
+  var styleName = props.display ? "block" : "none";
+  return (
+    <div className="win">
+      <h2>{props.msg}</h2>
+      <button onClick={props.handleRestart}>{props.btnMsg}</button>
+    </div>
+  );
+};
+
