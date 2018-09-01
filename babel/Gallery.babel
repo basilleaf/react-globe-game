@@ -225,7 +225,6 @@ class Gallery extends React.Component {
       >
         <section style={this.getFinishedStyle(key)} className="stage">
           <figure
-            title={key}
             role="group"
             aria-labelledby={key}
             className="ball"

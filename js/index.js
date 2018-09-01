@@ -266,7 +266,6 @@ var Gallery = function (_React$Component) {
           React.createElement(
             "figure",
             {
-              title: key,
               role: "group",
               "aria-labelledby": key,
               className: "ball",
