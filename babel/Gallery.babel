@@ -6,16 +6,16 @@ class Gallery extends React.Component {
       display: true,
       clicked: Array(),
       finished: Array(),
-      imageUrls: Array(),
+      imageUrls: Array(), // full set of possible image urls
       boardKeys: Array(),
-      remainingLinks: Array(),
+      remainingLinks: Array(), // image urls that have not appeared yet, subset of imageUrls
       isUsingKeyboardNav: false,
       focusStyle: "mouse"
     };
+    window.addEventListener("keyup", this.handleKeyUp.bind(this));
   }
   componentDidMount() {
-    this.setState({ imageUrls: this.getGameBoardUrls(allLinks) });
-    window.addEventListener("keyup", this.handleKeyUp.bind(this));
+    this.setState({ imageUrls: this.getGameBoardUrls(allLinks) }); // ajax call
   }
 
   getGameBoardUrls(links) {
