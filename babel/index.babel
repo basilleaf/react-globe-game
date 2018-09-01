@@ -30,7 +30,7 @@ class MessageScreen extends React.Component {
     return (
       <div className="win">
         <h2>{this.props.msg}</h2>
-        <button onClick={this.props.restartHandler}>{this.props.btnMsg}</button>
+        <button onClick={this.props.handleRestart}>{this.props.btnMsg}</button>
       </div>
     );
   }
@@ -119,7 +119,7 @@ class Gallery extends React.Component {
     }
   }
 
-  keyDownHandler(e) {
+  handleKeyDown(e) {
     // for navigating with arrow key
     if (!e.key | !["ArrowRight", "ArrowLeft"].includes(e.key)) {
       return;
@@ -130,7 +130,7 @@ class Gallery extends React.Component {
     this.moveFocus(parentEl, direction);
   }
 
-  globeClickHandler(key, e) {
+  handleGlobeClick(key, e) {
     if (!e.key) {
       // they switched back to using clicks/taps
       if (this.state.focusStyle == "keyboard") {
@@ -158,12 +158,12 @@ class Gallery extends React.Component {
       // a pair has been selected..
       // setTimeout allows 2nd clicked globe style to render
       setTimeout(() => {
-        this.pairHandler(clicked, el);
+        this.handlePairIsSelected(clicked, el);
       }, 300);
     }
   }
 
-  pairHandler(clicked, el) {
+  handlePairIsSelected(clicked, el) {
     // el is the last dom element clicked
 
     /* player selected a pair, check for matching
@@ -210,7 +210,7 @@ class Gallery extends React.Component {
     }
   }
 
-  playAgainHandler() {
+  handlePlayAgain() {
     /* "play again" button handler */
     this.setState({ finished: Array() });
     this.setState({
@@ -237,8 +237,8 @@ class Gallery extends React.Component {
         display={display}
         msg={msg}
         btnMsg={btnMsg}
-        restartHandler={() => {
-          this.playAgainHandler();
+        handleRestart={() => {
+          this.handlePlayAgain();
         }}
       />,
       document.getElementById("msg")
@@ -255,9 +255,9 @@ class Gallery extends React.Component {
         data-key={key}
         style={this.getGlobeStyle(key)}
         className={this.state.focusStyle}
-        onClick={e => this.globeClickHandler(key, e)}
-        onKeyPress={e => this.globeClickHandler(key, e)}
-        onKeyDown={e => this.keyDownHandler(e)}
+        onClick={e => this.handleGlobeClick(key, e)}
+        onKeyPress={e => this.handleGlobeClick(key, e)}
+        onKeyDown={e => this.handleKeyDown(e)}
       >
         <section style={this.getFinishedStyle(key)} className="stage">
           <figure
@@ -329,7 +329,7 @@ ReactDOM.render(
     display={true}
     msg={welcomeMsg}
     btnMsg="Start Game"
-    restartHandler={() => {
+    handleRestart={() => {
       startGame();
     }}
   />,

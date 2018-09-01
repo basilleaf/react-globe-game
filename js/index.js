@@ -59,7 +59,7 @@ var MessageScreen = function (_React$Component) {
         ),
         React.createElement(
           "button",
-          { onClick: this.props.restartHandler },
+          { onClick: this.props.handleRestart },
           this.props.btnMsg
         )
       );
@@ -157,8 +157,8 @@ var Gallery = function (_React$Component2) {
       }
     }
   }, {
-    key: "keyDownHandler",
-    value: function keyDownHandler(e) {
+    key: "handleKeyDown",
+    value: function handleKeyDown(e) {
       // for navigating with arrow key
       if (!e.key | !["ArrowRight", "ArrowLeft"].includes(e.key)) {
         return;
@@ -169,8 +169,8 @@ var Gallery = function (_React$Component2) {
       this.moveFocus(parentEl, direction);
     }
   }, {
-    key: "globeClickHandler",
-    value: function globeClickHandler(key, e) {
+    key: "handleGlobeClick",
+    value: function handleGlobeClick(key, e) {
       var _this3 = this;
 
       if (!e.key) {
@@ -200,13 +200,13 @@ var Gallery = function (_React$Component2) {
         // a pair has been selected..
         // setTimeout allows 2nd clicked globe style to render
         setTimeout(function () {
-          _this3.pairHandler(clicked, el);
+          _this3.handlePairIsSelected(clicked, el);
         }, 300);
       }
     }
   }, {
-    key: "pairHandler",
-    value: function pairHandler(clicked, el) {
+    key: "handlePairIsSelected",
+    value: function handlePairIsSelected(clicked, el) {
       var _this4 = this;
 
       // el is the last dom element clicked
@@ -258,8 +258,8 @@ var Gallery = function (_React$Component2) {
       }
     }
   }, {
-    key: "playAgainHandler",
-    value: function playAgainHandler() {
+    key: "handlePlayAgain",
+    value: function handlePlayAgain() {
       /* "play again" button handler */
       this.setState({ finished: Array() });
       this.setState({
@@ -289,8 +289,8 @@ var Gallery = function (_React$Component2) {
         display: display,
         msg: msg,
         btnMsg: btnMsg,
-        restartHandler: function restartHandler() {
-          _this5.playAgainHandler();
+        handleRestart: function handleRestart() {
+          _this5.handlePlayAgain();
         }
       }), document.getElementById("msg"));
     }
@@ -310,13 +310,13 @@ var Gallery = function (_React$Component2) {
           style: this.getGlobeStyle(key),
           className: this.state.focusStyle,
           onClick: function onClick(e) {
-            return _this6.globeClickHandler(key, e);
+            return _this6.handleGlobeClick(key, e);
           },
           onKeyPress: function onKeyPress(e) {
-            return _this6.globeClickHandler(key, e);
+            return _this6.handleGlobeClick(key, e);
           },
           onKeyDown: function onKeyDown(e) {
-            return _this6.keyDownHandler(e);
+            return _this6.handleKeyDown(e);
           }
         },
         React.createElement(
@@ -393,7 +393,7 @@ ReactDOM.render(React.createElement(MessageScreen, {
   display: true,
   msg: welcomeMsg,
   btnMsg: "Start Game",
-  restartHandler: function restartHandler() {
+  handleRestart: function handleRestart() {
     startGame();
   }
 }), document.getElementById("msg"));
