@@ -96,6 +96,7 @@ class Gallery extends React.Component {
     if (!e.key) {
       // they switched back to using clicks/taps
       if (this.state.focusStyle == "keyboard") {
+        this.setState({ isUsingKeyboardNav: false });
         this.setState({ focusStyle: "mouse" });
       }
     }
@@ -143,6 +144,7 @@ class Gallery extends React.Component {
 
     // we have a match, update the finished list..
     let finished = this.state.finished.slice().concat(clicked);
+
     this.setState({ finished: finished }, () => {
       // move focus to the next dom element for keyboard nav users
       if (this.state.isUsingKeyboardNav) {

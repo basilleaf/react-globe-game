@@ -21,20 +21,20 @@ var Gallery = function (_React$Component) {
       display: true,
       clicked: Array(),
       finished: Array(),
-      imageUrls: Array(),
+      imageUrls: Array(), // full set of possible image urls
       boardKeys: Array(),
-      remainingLinks: Array(),
+      remainingLinks: Array(), // image urls that have not appeared yet, subset of imageUrls
       isUsingKeyboardNav: false,
       focusStyle: "mouse"
     };
+    window.addEventListener("keyup", _this.handleKeyUp.bind(_this));
     return _this;
   }
 
   _createClass(Gallery, [{
     key: "componentDidMount",
     value: function componentDidMount() {
-      this.setState({ imageUrls: this.getGameBoardUrls(allLinks) });
-      window.addEventListener("keyup", this.handleKeyUp.bind(this));
+      this.setState({ imageUrls: this.getGameBoardUrls(allLinks) }); // ajax call
     }
   }, {
     key: "getGameBoardUrls",
@@ -115,6 +115,7 @@ var Gallery = function (_React$Component) {
       if (!e.key) {
         // they switched back to using clicks/taps
         if (this.state.focusStyle == "keyboard") {
+          this.setState({ isUsingKeyboardNav: false });
           this.setState({ focusStyle: "mouse" });
         }
       }
@@ -167,6 +168,7 @@ var Gallery = function (_React$Component) {
 
       // we have a match, update the finished list..
       var finished = this.state.finished.slice().concat(clicked);
+
       this.setState({ finished: finished }, function () {
         // move focus to the next dom element for keyboard nav users
         if (_this3.state.isUsingKeyboardNav) {
