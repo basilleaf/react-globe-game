@@ -1,8 +1,10 @@
 import allLinks from "../data.json";
 const baseUrl = "https://s3-us-west-1.amazonaws.com/marsfromspace.com/";
 
-const welcomeMsg =
-  "Welcome! This is a visual matching game. Click on the pairs of matching globes.";
+const welcomeMsg = `
+  Welcome! This is a visual matching game.
+  Click on the pairs of matching globes.
+  `;
 
 /* globe behavior styles */
 var clickedStyles = {
@@ -20,21 +22,19 @@ var finishedStyles = {
 };
 
 /* components */
-class MessageScreen extends React.Component {
+const MessageScreen = props => {
   /* interstitial screen for welcome and between games */
-  render() {
-    if (!this.props.display) {
-      return null;
-    }
-    var styleName = this.props.display ? "block" : "none";
-    return (
-      <div className="win">
-        <h2>{this.props.msg}</h2>
-        <button onClick={this.props.handleRestart}>{this.props.btnMsg}</button>
-      </div>
-    );
+  if (!props.display) {
+    return null;
   }
-}
+  var styleName = props.display ? "block" : "none";
+  return (
+    <div className="win">
+      <h2>{props.msg}</h2>
+      <button onClick={props.handleRestart}>{props.btnMsg}</button>
+    </div>
+  );
+};
 
 class Gallery extends React.Component {
   /* gallery of globe images is the matching game board */
@@ -309,6 +309,7 @@ function getGlobesCount() {
 
 function startGame() {
   /* hide the message screen */
+
   ReactDOM.render(
     <MessageScreen display={false} />,
     document.getElementById("msg")

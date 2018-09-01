@@ -12,7 +12,7 @@ var allLinks = ["ESP_013368_1885.jpg", "ESP_013954_1780.jpg", "ESP_014185_1095.j
 
 var baseUrl = "https://s3-us-west-1.amazonaws.com/marsfromspace.com/";
 
-var welcomeMsg = "Welcome! This is a visual matching game. Click on the pairs of matching globes.";
+var welcomeMsg = "\n  Welcome! This is a visual matching game.\n  Click on the pairs of matching globes.\n  ";
 
 /* globe behavior styles */
 var clickedStyles = {
@@ -30,55 +30,38 @@ var finishedStyles = {
 };
 
 /* components */
-
-var MessageScreen = function (_React$Component) {
-  _inherits(MessageScreen, _React$Component);
-
-  function MessageScreen() {
-    _classCallCheck(this, MessageScreen);
-
-    return _possibleConstructorReturn(this, (MessageScreen.__proto__ || Object.getPrototypeOf(MessageScreen)).apply(this, arguments));
+var MessageScreen = function MessageScreen(props) {
+  /* interstitial screen for welcome and between games */
+  if (!props.display) {
+    return null;
   }
+  var styleName = props.display ? "block" : "none";
+  return React.createElement(
+    "div",
+    { className: "win" },
+    React.createElement(
+      "h2",
+      null,
+      props.msg
+    ),
+    React.createElement(
+      "button",
+      { onClick: props.handleRestart },
+      props.btnMsg
+    )
+  );
+};
 
-  _createClass(MessageScreen, [{
-    key: "render",
-
-    /* interstitial screen for welcome and between games */
-    value: function render() {
-      if (!this.props.display) {
-        return null;
-      }
-      var styleName = this.props.display ? "block" : "none";
-      return React.createElement(
-        "div",
-        { className: "win" },
-        React.createElement(
-          "h2",
-          null,
-          this.props.msg
-        ),
-        React.createElement(
-          "button",
-          { onClick: this.props.handleRestart },
-          this.props.btnMsg
-        )
-      );
-    }
-  }]);
-
-  return MessageScreen;
-}(React.Component);
-
-var Gallery = function (_React$Component2) {
-  _inherits(Gallery, _React$Component2);
+var Gallery = function (_React$Component) {
+  _inherits(Gallery, _React$Component);
 
   /* gallery of globe images is the matching game board */
   function Gallery(props) {
     _classCallCheck(this, Gallery);
 
-    var _this2 = _possibleConstructorReturn(this, (Gallery.__proto__ || Object.getPrototypeOf(Gallery)).call(this, props));
+    var _this = _possibleConstructorReturn(this, (Gallery.__proto__ || Object.getPrototypeOf(Gallery)).call(this, props));
 
-    _this2.state = {
+    _this.state = {
       display: true,
       clicked: Array(),
       finished: Array(),
@@ -88,7 +71,7 @@ var Gallery = function (_React$Component2) {
       isUsingKeyboardNav: false,
       focusStyle: "mouse"
     };
-    return _this2;
+    return _this;
   }
 
   _createClass(Gallery, [{
@@ -171,7 +154,7 @@ var Gallery = function (_React$Component2) {
   }, {
     key: "handleGlobeClick",
     value: function handleGlobeClick(key, e) {
-      var _this3 = this;
+      var _this2 = this;
 
       if (!e.key) {
         // they switched back to using clicks/taps
@@ -200,14 +183,14 @@ var Gallery = function (_React$Component2) {
         // a pair has been selected..
         // setTimeout allows 2nd clicked globe style to render
         setTimeout(function () {
-          _this3.handlePairIsSelected(clicked, el);
+          _this2.handlePairIsSelected(clicked, el);
         }, 300);
       }
     }
   }, {
     key: "handlePairIsSelected",
     value: function handlePairIsSelected(clicked, el) {
-      var _this4 = this;
+      var _this3 = this;
 
       // el is the last dom element clicked
 
@@ -230,8 +213,8 @@ var Gallery = function (_React$Component2) {
       var finished = this.state.finished.slice().concat(clicked);
       this.setState({ finished: finished }, function () {
         // move focus to the next dom element for keyboard nav users
-        if (_this4.state.isUsingKeyboardNav) {
-          _this4.moveFocus(el, "next");
+        if (_this3.state.isUsingKeyboardNav) {
+          _this3.moveFocus(el, "next");
         }
       });
 
@@ -239,7 +222,7 @@ var Gallery = function (_React$Component2) {
         this.setState({ display: false });
         // there are no more globes to match! ask user to play again..
         setTimeout(function () {
-          _this4.renderMessageScreen(true, "good job!", "play again");
+          _this3.renderMessageScreen(true, "good job!", "play again");
         }, 200);
       }
     }
@@ -283,21 +266,21 @@ var Gallery = function (_React$Component2) {
   }, {
     key: "renderMessageScreen",
     value: function renderMessageScreen(display, msg, btnMsg) {
-      var _this5 = this;
+      var _this4 = this;
 
       ReactDOM.render(React.createElement(MessageScreen, {
         display: display,
         msg: msg,
         btnMsg: btnMsg,
         handleRestart: function handleRestart() {
-          _this5.handlePlayAgain();
+          _this4.handlePlayAgain();
         }
       }), document.getElementById("msg"));
     }
   }, {
     key: "renderGlobe",
     value: function renderGlobe(imageUrl, index) {
-      var _this6 = this;
+      var _this5 = this;
 
       var key = imageUrl.split("/").pop() + String(index); // unique key
 
@@ -310,13 +293,13 @@ var Gallery = function (_React$Component2) {
           style: this.getGlobeStyle(key),
           className: this.state.focusStyle,
           onClick: function onClick(e) {
-            return _this6.handleGlobeClick(key, e);
+            return _this5.handleGlobeClick(key, e);
           },
           onKeyPress: function onKeyPress(e) {
-            return _this6.handleGlobeClick(key, e);
+            return _this5.handleGlobeClick(key, e);
           },
           onKeyDown: function onKeyDown(e) {
-            return _this6.handleKeyDown(e);
+            return _this5.handleKeyDown(e);
           }
         },
         React.createElement(
@@ -339,7 +322,7 @@ var Gallery = function (_React$Component2) {
   }, {
     key: "render",
     value: function render() {
-      var _this7 = this;
+      var _this6 = this;
 
       if (!this.state.display) {
         return null;
@@ -351,7 +334,7 @@ var Gallery = function (_React$Component2) {
           "ul",
           { id: "images", className: "images" },
           this.state.imageUrls.map(function (imageUrl, index) {
-            return _this7.renderGlobe(imageUrl, index);
+            return _this6.renderGlobe(imageUrl, index);
           })
         )
       );
@@ -380,6 +363,7 @@ function getGlobesCount() {
 
 function startGame() {
   /* hide the message screen */
+
   ReactDOM.render(React.createElement(MessageScreen, { display: false }), document.getElementById("msg"));
 
   /* render the gallery  */
