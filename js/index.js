@@ -37,6 +37,11 @@ var Gallery = function (_React$Component) {
       this.setState({ imageUrls: this.getGameBoardUrls(allLinks) }); // ajax call
     }
   }, {
+    key: "componentWillUnMount",
+    value: function componentWillUnMount() {
+      window.removeEventListener("keyup", this.handleKeyUp.bind(this));
+    }
+  }, {
     key: "getGameBoardUrls",
     value: function getGameBoardUrls(links) {
       /* the gameboard presents a random

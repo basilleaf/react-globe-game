@@ -17,6 +17,9 @@ class Gallery extends React.Component {
   componentDidMount() {
     this.setState({ imageUrls: this.getGameBoardUrls(allLinks) }); // ajax call
   }
+  componentWillUnMount() {
+    window.removeEventListener("keyup", this.handleKeyUp.bind(this));
+  }
 
   getGameBoardUrls(links) {
     /* the gameboard presents a random
