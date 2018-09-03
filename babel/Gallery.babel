@@ -12,6 +12,7 @@ class Gallery extends React.Component {
       isUsingKeyboardNav: false,
       focusStyle: "mouse"
     };
+
     window.addEventListener("keyup", this.handleKeyUp.bind(this));
   }
   componentDidMount() {
@@ -85,17 +86,22 @@ class Gallery extends React.Component {
   }
 
   handleKeyDown(e) {
+    e.persist();
+
     // for navigating with arrow key
     if (!e.key | !["ArrowRight", "ArrowLeft"].includes(e.key)) {
       return;
     }
-    let parentEl = e.target; // the enclosing <li>
     var direction = e.key == "ArrowLeft" ? "prev" : "next";
 
-    this.moveFocus(parentEl, direction);
+    this.moveFocus(e.target, direction);
   }
 
   handleGlobeClick(key, e) {
+    // handle a single globe click
+    // key is the react internal key for the element
+    e.persist();
+
     if (!e.key) {
       // they switched back to using clicks/taps
       if (this.state.focusStyle == "keyboard") {
@@ -118,20 +124,16 @@ class Gallery extends React.Component {
     }
     // this is a legit clicked thing..
     clicked.push(key);
-    this.setState({ clicked: clicked });
-    if (clicked.length == 2) {
-      let el = e.target;
-      // a pair has been selected..
-      // setTimeout allows 2nd clicked globe style to render
-      setTimeout(() => {
-        this.handlePairIsSelected(clicked, el);
-      }, 300);
-    }
+    this.setState({ clicked: clicked }, () => {
+      if (clicked.length == 2) {
+        // a pair has been selected..
+        this.handlePairIsSelected(clicked, e.target);
+      }
+    });
   }
 
   handlePairIsSelected(clicked, el) {
     // el is the last dom element clicked
-
     /* player selected a pair, check for matching
        and handle match game play behavior */
 
@@ -187,26 +189,13 @@ class Gallery extends React.Component {
     this.renderMessageScreen(false, "", "");
   }
 
-  getGlobeStyle(key) {
-    return this.state.clicked.includes(key)
-      ? clickedStyles.clicked
-      : clickedStyles.default;
-  }
-  getFinishedStyle(key) {
-    if (this.state.finished.includes(key)) {
-      return finishedStyles.finished;
-    }
-  }
-
   renderMessageScreen(display, msg, btnMsg) {
     ReactDOM.render(
       <MessageScreen
         display={display}
         msg={msg}
         btnMsg={btnMsg}
-        handleRestart={() => {
-          this.handlePlayAgain();
-        }}
+        handleRestart={this.handlePlayAgain.bind(this)}
       />,
       document.getElementById("msg")
     );
@@ -220,13 +209,16 @@ class Gallery extends React.Component {
         key={key}
         tabIndex={0}
         data-key={key}
-        style={this.getGlobeStyle(key)}
+        style={getGlobeStyle({ key: key, clicked: this.state.clicked })}
         className={this.state.focusStyle}
         onClick={e => this.handleGlobeClick(key, e)}
         onKeyPress={e => this.handleGlobeClick(key, e)}
         onKeyDown={e => this.handleKeyDown(e)}
       >
-        <section style={this.getFinishedStyle(key)} className="stage">
+        <section
+          style={getFinishedStyle({ key: key, finished: this.state.finished })}
+          className="stage"
+        >
           <figure
             role="group"
             aria-labelledby={key}

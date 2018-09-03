@@ -1,6 +1,7 @@
 import allLinks from "../data.json";
 
 const baseUrl = "https://s3-us-west-1.amazonaws.com/marsfromspace.com/";
+
 const uniqueGlobesCount = getGlobesCount();
 
 const welcomeMsg = `
@@ -23,15 +24,25 @@ var finishedStyles = {
   }
 };
 
+const getGlobeStyle = props => {
+  return props.clicked.includes(props.key)
+    ? clickedStyles.clicked
+    : clickedStyles.default;
+};
+
+const getFinishedStyle = props => {
+  if (props.finished.includes(props.key)) {
+    return finishedStyles.finished;
+  }
+};
+
 // homescreen
 ReactDOM.render(
   <MessageScreen
     display={true}
     msg={welcomeMsg}
     btnMsg="Start Game"
-    handleRestart={() => {
-      startGame();
-    }}
+    handleRestart={startGame}
   />,
   document.getElementById("msg")
 );

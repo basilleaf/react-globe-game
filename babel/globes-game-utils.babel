@@ -1,4 +1,4 @@
-function getGlobesCount() {
+const getGlobesCount = () => {
   /* tries to guess how many unique globes are needed
      to fill the screen so gallery doesn't require scrolling  */
   var w = window.innerWidth;
@@ -13,9 +13,9 @@ function getGlobesCount() {
   var rowCount = Math.floor(h / globeSize); //
 
   return Math.floor(colCount * rowCount / 2);
-}
+};
 
-function startGame() {
+const startGame = () => {
   /* hide the message screen */
 
   ReactDOM.render(
@@ -28,6 +28,4 @@ function startGame() {
     <Gallery imageUrls={allLinks} />,
     document.getElementById("root")
   );
-}
-
-
+};
