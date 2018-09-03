@@ -3,7 +3,9 @@ import allLinks from "../data.json";
 const baseUrl = "https://s3-us-west-1.amazonaws.com/marsfromspace.com/";
 
 const uniqueGlobesCount = getGlobesCount();
-
+const moveUpDownIndex = moveUpDownIndex();
+console.log("hello");
+console.log(moveUpDownIndex);
 const welcomeMsg = `
   Welcome! This is a visual matching game.
   Click on the pairs of matching globes.

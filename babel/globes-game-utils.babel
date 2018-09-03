@@ -1,14 +1,32 @@
-const getGlobesCount = () => {
-  /* tries to guess how many unique globes are needed
-     to fill the screen so gallery doesn't require scrolling  */
+const moveUpDownIndex = () => {
+  // returns number of globes in 2d array to move back/forward
+  // to simulate moving up/down (for use with arrow keys)
   var w = window.innerWidth;
   var h = window.innerHeight;
+  /* tries to guess how many unique globes are needed
+     to fill the screen so gallery doesn't require scrolling  */
+  let globeSize = getGlobeSize(w, h);
+  let countPerRow = Math.floor(w / globeSize);
+  console.log(countPerRow);
+};
+
+const getGlobeSize = (w, h) => {
+  // returns globe size in pixels given width and height of window
   var globeSizeRem = 10; // css .ball width/height (ish) (this is janky guesswork)
   if (w < 569) {
     // iphone media query width
     globeSizeRem = 5.6; // this was tweaked and may not match globe size in scss
   }
   var globeSize = convertRemToPixels(globeSizeRem);
+  return globeSize;
+};
+
+const getGlobesCount = () => {
+  var w = window.innerWidth;
+  var h = window.innerHeight;
+  /* tries to guess how many unique globes are needed
+     to fill the screen so gallery doesn't require scrolling  */
+  let globeSize = getGlobeSize();
   var colCount = Math.floor(w / globeSize); //
   var rowCount = Math.floor(h / globeSize); //
 

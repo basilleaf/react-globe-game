@@ -45,7 +45,33 @@ class Gallery extends React.Component {
     return imageLinks.map(lnk => baseUrl + lnk);
   }
 
-  moveFocus(parentEl, direction) {
+  moveFocus(parentEl, direction, moveUpDownIndex) {
+    if (["up", "down"].includes(direction)) {
+      var currentKey =
+        parentEl.getAttribute("data-key").split(".jpg")[0] + ".jpg";
+      let boardKeys = this.state.boardKeys.slice();
+      var currentIndex = boardKeys.indexOf(currentKey);
+      console.log(moveUpDownIndex);
+      console.log(boardKeys);
+      console.log(currentKey);
+      console.log(currentIndex);
+      var nextIndex;
+      switch (direction) {
+        case "up":
+          nextIndex = currentIndex - moveUpDownIndex;
+          break;
+        case "down":
+          nextIndex = currentIndex + moveUpDownIndex;
+          break;
+      }
+      let nextKey = boardKeys[nextIndex];
+
+      console.log(moveUpDownIndex);
+      console.log(nextIndex);
+      console.log(nextKey);
+      console.log(document.querySelectorAll("[data-key='{nextKey}']")[0]);
+    }
+
     // moves focus from parentEl to next available globe
     // el is the <li> element
     // direction = next/prev (or right/left arrow key)
@@ -64,7 +90,7 @@ class Gallery extends React.Component {
       siblingContainer.focus();
     } catch (e) {
       // this happens on the begnning and end of the list of globes
-      // the arrow keys have a wraparound behavior
+      // we want the arrow keys have a wraparound behavior
       var currentKey =
         parentEl.getAttribute("data-key").split(".jpg")[0] + ".jpg";
       let boardKeys = this.state.boardKeys;
@@ -89,10 +115,26 @@ class Gallery extends React.Component {
     e.persist();
 
     // for navigating with arrow key
-    if (!e.key | !["ArrowRight", "ArrowLeft"].includes(e.key)) {
+    let accepted = ["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown"];
+    if (!e.key | !accepted.includes(e.key)) {
       return;
     }
-    var direction = e.key == "ArrowLeft" ? "prev" : "next";
+
+    var direction;
+    switch (e.key) {
+      case "ArrowLeft":
+        direction = "prev";
+        break;
+      case "ArrowRight":
+        direction = "next";
+        break;
+      case "ArrowUp":
+        direction = "up";
+        break;
+      case "ArrowDown":
+        direction = "down";
+        break;
+    }
 
     this.moveFocus(e.target, direction);
   }

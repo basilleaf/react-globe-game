@@ -67,7 +67,32 @@ var Gallery = function (_React$Component) {
     }
   }, {
     key: "moveFocus",
-    value: function moveFocus(parentEl, direction) {
+    value: function moveFocus(parentEl, direction, moveUpDownIndex) {
+      if (["up", "down"].includes(direction)) {
+        var currentKey = parentEl.getAttribute("data-key").split(".jpg")[0] + ".jpg";
+        var boardKeys = this.state.boardKeys.slice();
+        var currentIndex = boardKeys.indexOf(currentKey);
+        console.log(moveUpDownIndex);
+        console.log(boardKeys);
+        console.log(currentKey);
+        console.log(currentIndex);
+        var nextIndex;
+        switch (direction) {
+          case "up":
+            nextIndex = currentIndex - moveUpDownIndex;
+            break;
+          case "down":
+            nextIndex = currentIndex + moveUpDownIndex;
+            break;
+        }
+        var nextKey = boardKeys[nextIndex];
+
+        console.log(moveUpDownIndex);
+        console.log(nextIndex);
+        console.log(nextKey);
+        console.log(document.querySelectorAll("[data-key='{nextKey}']")[0]);
+      }
+
       // moves focus from parentEl to next available globe
       // el is the <li> element
       // direction = next/prev (or right/left arrow key)
@@ -85,16 +110,16 @@ var Gallery = function (_React$Component) {
         siblingContainer.focus();
       } catch (e) {
         // this happens on the begnning and end of the list of globes
-        // the arrow keys have a wraparound behavior
+        // we want the arrow keys have a wraparound behavior
         var currentKey = parentEl.getAttribute("data-key").split(".jpg")[0] + ".jpg";
-        var boardKeys = this.state.boardKeys;
-        if (currentKey == boardKeys[0] & direction == "prev") {
+        var _boardKeys = this.state.boardKeys;
+        if (currentKey == _boardKeys[0] & direction == "prev") {
           // they hit left arrow while on the first globe
           // bring focus to last globe
           document.getElementById("images").lastChild.focus();
           // they are at the beginning of the list, send them to the end
         }
-        if (currentKey == boardKeys[boardKeys.length - 1] & direction == "next") {
+        if (currentKey == _boardKeys[_boardKeys.length - 1] & direction == "next") {
           // they hit right arrow while on the last globe,
           // bring focus to first globe
           document.getElementById("images").firstChild.focus();
@@ -107,10 +132,26 @@ var Gallery = function (_React$Component) {
       e.persist();
 
       // for navigating with arrow key
-      if (!e.key | !["ArrowRight", "ArrowLeft"].includes(e.key)) {
+      var accepted = ["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown"];
+      if (!e.key | !accepted.includes(e.key)) {
         return;
       }
-      var direction = e.key == "ArrowLeft" ? "prev" : "next";
+
+      var direction;
+      switch (e.key) {
+        case "ArrowLeft":
+          direction = "prev";
+          break;
+        case "ArrowRight":
+          direction = "next";
+          break;
+        case "ArrowUp":
+          direction = "up";
+          break;
+        case "ArrowDown":
+          direction = "down";
+          break;
+      }
 
       this.moveFocus(e.target, direction);
     }
@@ -319,17 +360,35 @@ var MessageScreen = function MessageScreen(props) {
 };
 "use strict";
 
-var getGlobesCount = function getGlobesCount() {
-  /* tries to guess how many unique globes are needed
-     to fill the screen so gallery doesn't require scrolling  */
+var moveUpDownIndex = function moveUpDownIndex() {
+  // returns number of globes in 2d array to move back/forward
+  // to simulate moving up/down (for use with arrow keys)
   var w = window.innerWidth;
   var h = window.innerHeight;
+  /* tries to guess how many unique globes are needed
+     to fill the screen so gallery doesn't require scrolling  */
+  var globeSize = getGlobeSize(w, h);
+  var countPerRow = Math.floor(w / globeSize);
+  console.log(countPerRow);
+};
+
+var getGlobeSize = function getGlobeSize(w, h) {
+  // returns globe size in pixels given width and height of window
   var globeSizeRem = 10; // css .ball width/height (ish) (this is janky guesswork)
   if (w < 569) {
     // iphone media query width
     globeSizeRem = 5.6; // this was tweaked and may not match globe size in scss
   }
   var globeSize = convertRemToPixels(globeSizeRem);
+  return globeSize;
+};
+
+var getGlobesCount = function getGlobesCount() {
+  var w = window.innerWidth;
+  var h = window.innerHeight;
+  /* tries to guess how many unique globes are needed
+     to fill the screen so gallery doesn't require scrolling  */
+  var globeSize = getGlobeSize();
   var colCount = Math.floor(w / globeSize); //
   var rowCount = Math.floor(h / globeSize); //
 
@@ -352,7 +411,9 @@ var allLinks = ["ESP_013368_1885.jpg", "ESP_013954_1780.jpg", "ESP_014185_1095.j
 var baseUrl = "https://s3-us-west-1.amazonaws.com/marsfromspace.com/";
 
 var uniqueGlobesCount = getGlobesCount();
-
+var moveUpDownIndex = moveUpDownIndex();
+console.log("hello");
+console.log(moveUpDownIndex);
 var welcomeMsg = "\n  Welcome! This is a visual matching game.\n  Click on the pairs of matching globes.\n  ";
 
 /* globe behavior styles */
