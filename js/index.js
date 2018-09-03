@@ -22,7 +22,6 @@ var Gallery = function (_React$Component) {
       clicked: Array(),
       finished: Array(),
       imageUrls: Array(), // full set of possible image urls
-      boardKeys: Array(),
       remainingLinks: Array(), // image urls that have not appeared yet, subset of imageUrls
       isUsingKeyboardNav: false,
       focusStyle: "mouse"
@@ -50,7 +49,6 @@ var Gallery = function (_React$Component) {
          based on available screen size */
       links = shuffle(links); // the big list of all links
       var imageLinks = shuffle(links.slice(0, uniqueGlobesCount).concat(links.slice(0, uniqueGlobesCount)));
-      this.setState({ boardKeys: imageLinks }); // help for arrow key navigation
 
       var remainingLinks = links.filter(function (x) {
         return !imageLinks.includes(x);
@@ -67,15 +65,11 @@ var Gallery = function (_React$Component) {
     }
   }, {
     key: "moveFocus",
-    value: function moveFocus(parentEl, direction, moveUpDownIndex) {
+    value: function moveFocus(parentEl, direction) {
       if (["up", "down"].includes(direction)) {
-        var currentKey = parentEl.getAttribute("data-key").split(".jpg")[0] + ".jpg";
-        var boardKeys = this.state.boardKeys.slice();
-        var currentIndex = boardKeys.indexOf(currentKey);
-        console.log(moveUpDownIndex);
-        console.log(boardKeys);
-        console.log(currentKey);
-        console.log(currentIndex);
+        var containerEl = document.getElementById("images");
+        var currentIndex = Array.prototype.indexOf.call(containerEl.children, parentEl);
+
         var nextIndex;
         switch (direction) {
           case "up":
@@ -85,52 +79,31 @@ var Gallery = function (_React$Component) {
             nextIndex = currentIndex + moveUpDownIndex;
             break;
         }
-        var nextKey = boardKeys[nextIndex];
 
-        console.log(moveUpDownIndex);
-        console.log(nextIndex);
-        console.log(nextKey);
-        console.log(document.querySelectorAll("[data-key='{nextKey}']")[0]);
+        var nextEl = containerEl.children.item(nextIndex);
+
+        try {
+          nextEl.focus();
+        } catch (e) {
+          return; // we are at the top/bottom of board, do nothing
+        }
+        return; // done with up/down
       }
-
-      // moves focus from parentEl to next available globe
-      // el is the <li> element
-      // direction = next/prev (or right/left arrow key)
 
       // find the appropriate next sibling (before or after this one)
       var siblingContainer = direction == "next" ? parentEl.nextSibling : parentEl.previousSibling;
 
       try {
-        var siblingKey = siblingContainer.getAttribute("data-key");
-        if (this.state.finished.includes(siblingKey)) {
-          // this globe is hidden, move to next available sibling
-          return this.moveFocus(siblingContainer, direction);
-        }
         // this is available, focus this element
         siblingContainer.focus();
       } catch (e) {
         // this happens on the begnning and end of the list of globes
-        // we want the arrow keys have a wraparound behavior
-        var currentKey = parentEl.getAttribute("data-key").split(".jpg")[0] + ".jpg";
-        var _boardKeys = this.state.boardKeys;
-        if (currentKey == _boardKeys[0] & direction == "prev") {
-          // they hit left arrow while on the first globe
-          // bring focus to last globe
-          document.getElementById("images").lastChild.focus();
-          // they are at the beginning of the list, send them to the end
-        }
-        if (currentKey == _boardKeys[_boardKeys.length - 1] & direction == "next") {
-          // they hit right arrow while on the last globe,
-          // bring focus to first globe
-          document.getElementById("images").firstChild.focus();
-        }
+        return;
       }
     }
   }, {
     key: "handleKeyDown",
     value: function handleKeyDown(e) {
-      e.persist();
-
       // for navigating with arrow key
       var accepted = ["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown"];
       if (!e.key | !accepted.includes(e.key)) {
@@ -189,13 +162,13 @@ var Gallery = function (_React$Component) {
       this.setState({ clicked: clicked }, function () {
         if (clicked.length == 2) {
           // a pair has been selected..
-          _this2.handlePairIsSelected(clicked, e.target);
+          _this2.handleMatch(clicked, e.target);
         }
       });
     }
   }, {
-    key: "handlePairIsSelected",
-    value: function handlePairIsSelected(clicked, el) {
+    key: "handleMatch",
+    value: function handleMatch(clicked, el) {
       var _this3 = this;
 
       // el is the last dom element clicked
@@ -217,12 +190,7 @@ var Gallery = function (_React$Component) {
       // we have a match, update the finished list..
       var finished = this.state.finished.slice().concat(clicked);
 
-      this.setState({ finished: finished }, function () {
-        // move focus to the next dom element for keyboard nav users
-        if (_this3.state.isUsingKeyboardNav) {
-          _this3.moveFocus(el, "next");
-        }
-      });
+      this.setState({ finished: finished });
 
       if (finished.length == 2 * uniqueGlobesCount) {
         this.setState({ display: false });
@@ -360,18 +328,6 @@ var MessageScreen = function MessageScreen(props) {
 };
 "use strict";
 
-var moveUpDownIndex = function moveUpDownIndex() {
-  // returns number of globes in 2d array to move back/forward
-  // to simulate moving up/down (for use with arrow keys)
-  var w = window.innerWidth;
-  var h = window.innerHeight;
-  /* tries to guess how many unique globes are needed
-     to fill the screen so gallery doesn't require scrolling  */
-  var globeSize = getGlobeSize(w, h);
-  var countPerRow = Math.floor(w / globeSize);
-  console.log(countPerRow);
-};
-
 var getGlobeSize = function getGlobeSize(w, h) {
   // returns globe size in pixels given width and height of window
   var globeSizeRem = 10; // css .ball width/height (ish) (this is janky guesswork)
@@ -381,6 +337,18 @@ var getGlobeSize = function getGlobeSize(w, h) {
   }
   var globeSize = convertRemToPixels(globeSizeRem);
   return globeSize;
+};
+
+var moveUpDownIndex = function moveUpDownIndex() {
+  // returns number of globes in 2d array to move back/forward
+  // to simulate moving up/down (for use with arrow keys)
+  var w = window.innerWidth;
+  var h = window.innerHeight;
+  /* tries to guess how many unique globes are needed
+     to fill the screen so gallery doesn't require scrolling  */
+  var globeSize = getGlobeSize(w, h);
+  var countPerRow = Math.floor(w / globeSize);
+  return Math.floor(w / globeSize);
 };
 
 var getGlobesCount = function getGlobesCount() {
@@ -412,8 +380,7 @@ var baseUrl = "https://s3-us-west-1.amazonaws.com/marsfromspace.com/";
 
 var uniqueGlobesCount = getGlobesCount();
 var moveUpDownIndex = moveUpDownIndex();
-console.log("hello");
-console.log(moveUpDownIndex);
+
 var welcomeMsg = "\n  Welcome! This is a visual matching game.\n  Click on the pairs of matching globes.\n  ";
 
 /* globe behavior styles */
@@ -427,7 +394,7 @@ var clickedStyles = {
 };
 var finishedStyles = {
   finished: {
-    display: "none"
+    visibility: "hidden"
   }
 };
 
